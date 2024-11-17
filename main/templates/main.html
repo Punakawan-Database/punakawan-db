@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Main</title>
+{% endblock meta %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<!-- Full viewport height container to center content with blue background -->
+<div class="flex items-center justify-center min-h-screen bg-blue-600 text-center flex-col text-white">
+    <!-- Welcome Text with Bold, Large, Centered, White Color -->
+    <p class="text-4xl font-bold mb-2">
+        Welcome to
+    </p>
+
+    <!-- Punakawan DB Text with Bold, Large, Centered, White Color -->
+    <p class="text-5xl font-bold mb-4">
+        Punakawan DB
+    </p>
+
+    <!-- Hola, soy! message with white font -->
+    <h1 class="text-3xl mt-6">Hola, soy!</h1>
+
+    <!-- Dynamic name with white font -->
+    <p class="text-lg mt-2">{{ name }}</p>
+</div>
+
+
+{% endblock content %}
