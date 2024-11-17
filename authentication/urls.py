@@ -10,7 +10,8 @@ urlpatterns = [
     path('blog/', views.customer_blog, name='customer_blog'),    
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-categories/', views.admin_categories, name='admin_categories'),
-    path('profile/', views.profile, name='profile'),
+    path('profile-pengguna/', views.profile_pengguna, name='profile_pengguna'),
+    path('profile-pekerja/', views.profile_pekerja, name='profile_pekerja'),
     path('update-profile/', views.update_profile, name='update_profile'),
     path('update-photo/', views.update_photo, name='update_photo'),
     path('delete-photo/', views.delete_photo, name='delete_photo'),
@@ -18,4 +19,6 @@ urlpatterns = [
     path('delete_account/', views.delete_account, name='delete_account'),
     path('register-user/', views.register_user, name='register_user'),
     path('register-worker/', views.register_worker, name='register_worker'),
+    path('update-pengguna/', views.update_pengguna, name='update_pengguna'),
+    path('update-pekerja/', views.update_pekerja, name='update_pekerja'),
 ]

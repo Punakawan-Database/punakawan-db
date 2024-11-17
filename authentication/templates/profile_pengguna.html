@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>User Profile</title>
+{% endblock meta %}
+
+{% block content %}
+{% include 'navbar_pengguna.html' %}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center py-8 px-4">
+  <div class="bg-white/95 shadow-2xl rounded-2xl p-6 w-full max-w-2xl transform hover:scale-[1.02] transition-all duration-300">
+    <div class="flex items-center space-x-4 mb-6">
+      <div class="bg-blue-100 p-3 rounded-full">
+        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">User Profile</h2>
+        <p class="text-sm text-gray-500">Manage your personal information</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">Full Name</span>
+        <p class="text-gray-800 font-semibold text-sm">John Doe</p>
+      </div>
+
+      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">Level</span>
+        <p class="text-gray-800 font-semibold text-sm">Premium Member</p>
+      </div>
+
+      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">Gender</span>
+        <p class="text-gray-800 font-semibold text-sm">Male</p>
+      </div>
+
+      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">Phone Number</span>
+        <p class="text-gray-800 font-semibold text-sm">+62 812 3456 7890</p>
+      </div>
+
+      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">Date of Birth</span>
+        <p class="text-gray-800 font-semibold text-sm">January 15, 1990</p>
+      </div>
+
+      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">Address</span>
+        <p class="text-gray-800 font-semibold text-sm">123 Main Street, Jakarta</p>
+      </div>
+
+      <div class="md:col-span-2 group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+        <span class="block text-gray-500 text-xs font-medium mb-1">MyPay Balance</span>
+        <p class="text-gray-800 font-semibold">Rp 1,500,000.00</p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button onclick="window.location.href='{% url 'update_pengguna' %}'" 
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg
+               shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200
+               flex items-center space-x-2 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+        <span>Update Profile</span>
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock content %}
