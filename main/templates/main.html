@@ -1,2 +1,30 @@
-<h1>Hola, soy!</h1>
-<p>{{ name }}<p>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Main</title>
+{% endblock meta %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<!-- Full viewport height container to center content -->
+<div class="flex items-center justify-center min-h-screen text-center flex-col">
+    <!-- Welcome Text with Bold, Large, Centered, Black Color -->
+    <p class="text-4xl font-bold text-black mb-2">
+        Welcome to
+    </p>
+
+    <!-- Punakawan DB Text with Bold, Large, Centered, Blue Color -->
+    <p class="text-5xl font-bold text-blue-600 mb-4">
+        Punakawan DB
+    </p>
+
+    <!-- Hola, soy! message -->
+    <h1 class="text-3xl mt-6">Hola, soy!</h1>
+
+    <!-- Dynamic name -->
+    <p class="text-lg mt-2">{{ name }}</p>
+</div>
+
+{% endblock content %}
