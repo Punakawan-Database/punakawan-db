@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'homepage',
     'main',
     'authentication',
+    'Diskon',
 ]
 
 MIDDLEWARE = [
