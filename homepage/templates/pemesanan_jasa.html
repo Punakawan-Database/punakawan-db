@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PunakawanDB</title>
+</head>
+
+<body>
+    <div>
+        <select name="Subategori" id="Subkategori">
+            <option selected disabled hidden>Select Subkategori</option>
+            <!-- {% for category in categories %}
+                <option value="{{ category.slug }}">{{ category.name }}</option>
+            {% endfor %} -->
+        </select>
+        
+        <select id="status_pesanan">
+            <option selected disabled hidden>Status Pesanan</option>
+        </select>
+
+        <button type="button" id="submit">Search</button>
+    </div>
+
+    <div>
+        {% for pemesanan_jasa in orders%}
+        {{ pemesanan_jasa.subcategory }} | {{ pemesanan_jasa.service_session }} | {{ pemesanan_jasa.total_payment }}
+        {{ pemesanan_jasa.worker }} | {{ pemesanan_jasa.get_status_display }}
+
+        {% if pemesanan_jasa.get_status_display == "Menunggu Pembayaran" %}
+        <button>Batalkan</button>
+        {% endif %}
+
+        {% if pemesanan_jasa.get_status_display == "Mencari Pekerja Terdekat" %}
+        <button>Batalkan</button>
+        {% endif %}
+
+        {% if pemesanan_jasa.get_status_display == "Pesanan Selesai" %}
+        <button>Buat Testimoni</button>
+        {% endif %}
+
+        <br>
+        {% endfor %}
+    </div>
+</body>

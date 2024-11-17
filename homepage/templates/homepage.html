@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PunakawanDB</title>
+</head>
+
+<body>
+    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+    {{ title }}
+    </div>
+
+    <div style="display: flex; flex-direction: col;">
+        <select name="Kategori" id="Kategori">
+            <option selected disabled hidden>Select Kategori</option>
+            {% for category in categories %}
+                <option value="{{ category.slug }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" id="search_subkategori" name="search_subkategori" placeholder="Nama Subkategori">
+
+        <button type="button" id="submit">Search</button>
+    </div>
+
+    <br>
+    <div id="category-list">
+        {% for category in categories %}
+            <div class="category" data-category-slug="{{ category.slug }}">
+                <label> {{ category.name }} </label>
+                <ol>
+                    {% for item in category.subcategories %}
+                        <li class="subcategory" data-subcategory-name="{{ item.name }}">
+                            <a href="{% url 'subkategori_jasa' kategori_slug=category.slug subkategori_slug=item.slug %}">
+                                {{ item.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        {% endfor %}
+        <label> Kategori 4</label>
+            <ol>
+                <li class="subcategory_pekerja">
+                    <a href="{% url 'subkategori_jasa_pekerja' kategori_slug='k4' subkategori_slug='sk1' %}">
+                        Subkategori 1
+                    </a>
+                </li>
+            </ol>
+    </div>
+
+    <script>
+        document.getElementById("submit").addEventListener("click", function () {
+            const selectedCategory = document.getElementById("Kategori").value;
+            const searchInput = document.getElementById("search_subkategori").value.toLowerCase();
+            const categories = document.querySelectorAll(".category");
+
+            categories.forEach(category => {
+                const categorySlug = category.getAttribute("data-category-slug");
+                const subcategories = category.querySelectorAll(".subcategory");
+                let categoryVisible = false;
+
+                if (!selectedCategory || categorySlug === selectedCategory) {
+                    subcategories.forEach(subcategory => {
+                        const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
+                        if (!searchInput || subcategoryName.includes(searchInput)) {
+                            subcategory.style.display = "list-item";
+                            categoryVisible = true;
+                        } else {
+                            subcategory.style.display = "none";
+                        }
+                    });
+
+                    category.style.display = categoryVisible ? "block" : "none";
+                } else {
+                    category.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Example</title>
+    <style>
+        /* Modal container */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal content box */
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Close button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Content -->
+    <div style="width: 400px;">
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+            <span>{{ selected_category.name }}</span>
+            <span>{{ selected_subcategory.name }}</span>
+        </div>
+        <br>
+        <div style="width: 300px; display: flex; flex-direction: row; align-items: center; justify-content: center;">
+            {{ selected_subcategory.description }}
+        </div>
+        <br>
+        <div>
+            Pilihan sesi layanan
+            {% for session in service_sessions %}
+            <div>
+                {{ session.name }} | {{ session.price }}
+                <!-- <button class="open-modal-btn">Button Pesan</button> -->
+            </div>
+            {% endfor %}
+        </div>
+        <div>
+            <br>
+            Pekerja
+            <div style="display: flex; flex-direction: column;">
+                <table style="width:100%;">
+                    <tr>
+                        {% for worker in workers %}
+                        <th>{{ worker.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div>
+            <button>
+                button bergabung
+            </button>
+        </div>
+        <div>
+            <br>
+            Testimoni
+            <div>
+                {% for testimonial in testimonials %}
+                <div>
+                    {{ testimonial.user_name }}
+                    <br>
+                    to {{ testimonial.worker_name }} on {{ testimonial.date }} {{ testimonial.rating }} point/s
+                    <br>
+                    {{ testimonial.text }}
+                </div>
+                <br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
