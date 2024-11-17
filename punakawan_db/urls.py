@@ -23,4 +23,5 @@ urlpatterns = [
     path('homepage/', include('homepage.urls')),
     path('', include('main.urls')),
     path('auth/', include('authentication.urls')),
+    path('diskon/', include('Diskon.urls')),
 ]
