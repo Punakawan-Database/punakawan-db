@@ -8,54 +8,59 @@
 {% block content %}
 {% include 'navbar.html' %}
 
-<div style="position: relative; height: 100vh; background-image: url('{% static "images/register.png" %}'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-    <!-- Dark Overlay -->
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1;"></div>
-
+<div class="relative h-screen flex justify-center items-center bg-blue-500 p-5">
     <!-- Form Container -->
-    <div style="position: relative; z-index: 2; background-color: rgba(245, 245, 245, 0.95); padding: 30px; border-radius: 10px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;">
-        <h1 style="color: #b48125; text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold;">User Registration</h1>
+    <div class="relative bg-white p-8 rounded-lg shadow-md hover:shadow-xl max-w-md w-full h-[80vh] overflow-y-auto">
+        <h1 class="text-blue-600 text-center mb-6 text-2xl font-bold">User Registration</h1>
 
-        <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+        <form method="post" class="flex flex-col gap-6">
             {% csrf_token %}
 
             {% for field in form %}
-                <div style="display: flex; flex-direction: column;">
-                    <label for="{{ field.id_for_label }}" style="color: #2A3A30; font-weight: bold; margin-bottom: 5px;">{{ field.label }}</label>
+                <div class="flex flex-col">
+                    <label for="{{ field.id_for_label }}" class="text-blue-600 font-semibold mb-2">{{ field.label }}</label>
 
                     {% if field.field.widget.input_type == 'select' %}
                         <!-- Select input for choices like gender and role -->
-                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" style="padding: 12px; height: 45px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select 
+                            name="{{ field.name }}" 
+                            id="{{ field.id_for_label }}" 
+                            class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
                             {% for option in field.field.choices %}
                                 <option value="{{ option.0 }}" {% if field.value == option.0 %}selected{% endif %}>{{ option.1 }}</option>
                             {% endfor %}
                         </select>
                     {% else %}
                         <!-- Normal input for other fields -->
-                        <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default_if_none:'' }}" style="padding: 12px; height: 45px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+                        <input 
+                            type="{{ field.field.widget.input_type }}" 
+                            name="{{ field.name }}" 
+                            id="{{ field.id_for_label }}" 
+                            value="{{ field.value|default_if_none:'' }}" 
+                            class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     {% endif %}
 
                     {% if field.errors %}
                         {% for error in field.errors %}
-                            <p style="color: red; font-size: 12px; margin-top: 2px;">{{ error }}</p>
+                            <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                         {% endfor %}
                     {% endif %}
                 </div>
             {% endfor %}
 
             <!-- Submit Button -->
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <button type="submit" style="background-color: #8A6240; color: #FFF; padding: 15px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; width: 100%;">
+            <div class="flex justify-center">
+                <button type="submit" class="bg-blue-600 text-white py-3 px-4 rounded font-bold hover:bg-blue-700 transition-all w-full">
                     Register
                 </button>
             </div>
         </form>
 
         <!-- Login Link -->
-        <div style="text-align: center; margin-top: 10px;">
-            <p style="font-size: 14px; color: #2A3A30;">
+        <div class="text-center mt-4">
+            <p class="text-sm text-blue-600">
                 Already have an account? 
-                <a href="{% url 'login' %}" style="color: #b48125; font-weight: bold; text-decoration: underline;">Login here</a>
+                <a href="{% url 'login' %}" class="font-bold underline hover:text-blue-800">Login here</a>
             </p>
         </div>
     </div>
