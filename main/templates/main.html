@@ -8,23 +8,24 @@
 {% block content %}
 {% include 'navbar.html' %}
 
-<!-- Full viewport height container to center content -->
-<div class="flex items-center justify-center min-h-screen text-center flex-col">
-    <!-- Welcome Text with Bold, Large, Centered, Black Color -->
-    <p class="text-4xl font-bold text-black mb-2">
+<!-- Full viewport height container to center content with blue background -->
+<div class="flex items-center justify-center min-h-screen bg-blue-600 text-center flex-col text-white">
+    <!-- Welcome Text with Bold, Large, Centered, White Color -->
+    <p class="text-4xl font-bold mb-2">
         Welcome to
     </p>
 
-    <!-- Punakawan DB Text with Bold, Large, Centered, Blue Color -->
-    <p class="text-5xl font-bold text-blue-600 mb-4">
+    <!-- Punakawan DB Text with Bold, Large, Centered, White Color -->
+    <p class="text-5xl font-bold mb-4">
         Punakawan DB
     </p>
 
-    <!-- Hola, soy! message -->
+    <!-- Hola, soy! message with white font -->
     <h1 class="text-3xl mt-6">Hola, soy!</h1>
 
-    <!-- Dynamic name -->
+    <!-- Dynamic name with white font -->
     <p class="text-lg mt-2">{{ name }}</p>
 </div>
+
 
 {% endblock content %}
