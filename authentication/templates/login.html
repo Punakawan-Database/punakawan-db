@@ -13,34 +13,24 @@
     <div class="absolute inset-0 bg-blue-900 bg-opacity-30 z-0"></div>
 
     <!-- Form Container -->
-    <div class="relative z-10 bg-white bg-opacity-95 p-6 rounded-lg shadow-lg max-w-md w-full transition-shadow duration-300 hover:shadow-2xl">
+    <div class="relative z-10 bg-white bg-opacity-95 p-6 rounded-3xl shadow-lg max-w-md w-full transition-shadow duration-300 hover:shadow-2xl">
         <h1 class="text-2xl font-bold text-blue-600 text-center mb-6">Login</h1>
 
         <form method="post" class="space-y-4">
             {% csrf_token %}
 
-            <!-- Username Field -->
+            <!-- Phone Number (No. HP) Field -->
             <div>
-                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-blue-800 mb-1">Username</label>
-                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default_if_none:'' }}" 
-                       class="w-full px-3 py-2 border rounded-md text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                {% if form.username.errors %}
-                    {% for error in form.username.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+                <label for="no_hp" class="block text-sm font-medium text-blue-800 mb-1">No. HP</label>
+                <input type="text" name="no_hp" id="no_hp" class="w-full px-3 py-2 border rounded-md text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                       placeholder="Enter No. HP" required>
             </div>
 
             <!-- Password Field -->
             <div>
-                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-blue-800 mb-1">Password</label>
-                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" 
-                       class="w-full px-3 py-2 border rounded-md text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                {% if form.password.errors %}
-                    {% for error in form.password.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+                <label for="password" class="block text-sm font-medium text-blue-800 mb-1">Password</label>
+                <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded-md text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                       placeholder="Enter Password" required>
             </div>
 
             <!-- Alert Message (if any) -->
@@ -53,8 +43,7 @@
             {% endif %}
 
             <!-- Submit Button -->
-            <button type="submit" 
-                    class="w-full bg-blue-600 text-white font-bold py-2 rounded-md hover:bg-blue-700 transition-all">
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded-md hover:bg-blue-700 transition-all">
                 Login
             </button>
         </form>

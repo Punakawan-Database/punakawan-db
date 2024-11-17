@@ -6,10 +6,14 @@ class CustomUser(AbstractUser):
         ('customer', 'Customer'),
         ('admin', 'Admin'),
     )
+    GENDER_CHOICES = (
+        ('L', 'Laki-laki'),
+        ('P', 'Perempuan'),
+    )
     full_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     age = models.IntegerField()
-    gender = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='L')
     phone_number = models.CharField(max_length=15)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
 

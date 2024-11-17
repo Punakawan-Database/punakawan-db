@@ -1,5 +1,5 @@
 import datetime
-from .forms import UserRegistrationForm, EditProfileForm
+from .forms import PenggunaRegistrationForm, PekerjaRegistrationForm, EditProfileForm
 from .decorators import role_required
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
@@ -10,43 +10,35 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User
+
+def register(request):
+    return render(request, 'register.html')
+
 
 def register_user(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'register_user.html')
+
+def register_worker(request):
+    return render(request, 'register_worker.html')
 
 def login_user(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        no_hp = request.POST.get('no_hp')
+        password = request.POST.get('password')
 
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            
-            # Set cookie untuk 'last_login'
-            response = HttpResponseRedirect(reverse("main:show_main"))
-            response.set_cookie('last_login', str(datetime.datetime.now()))
+        # Dummy authentication for testing purposes
+        if (no_hp == '2' and password == 'pengguna'):
+            return redirect('main_pengguna')
 
-            # Redirect ke dashboard sesuai role
-            if user.role == 'customer':
-                return redirect('customer_dashboard')
-            elif user.role == 'admin':
-                return redirect('admin_dashboard')
+        elif (no_hp == '1' and password == 'pekerja'):
+            return redirect('main_pekerja')
 
+        # If authentication failed for both
         else:
-            # Tambahkan pesan error jika login gagal
-            messages.error(request, "Invalid username or password. Please try again.")
-    else:
-        form = AuthenticationForm(request)
-
-    context = {'form': form}
-    return render(request, 'login.html', context)
+            messages.error(request, "Invalid No. HP or Password. Please try again.")
+    
+    return render(request, 'login.html')
 
 @login_required
 @csrf_exempt
