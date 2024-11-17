@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Login</title>
+{% endblock meta %}
+
+{% block content %}
+{% include 'navbar.html' %}
+
+<div style="position: relative; height: 100vh; background-image: url('{% static "images/register.png" %}'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+    <!-- Dark Overlay -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1;"></div>
+
+    <!-- Form Container -->
+    <div style="position: relative; z-index: 2; background-color: rgba(245, 245, 245, 0.95); padding: 30px; border-radius: 10px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;">
+        <h1 style="color: #b48125; text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold;">Login</h1>
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+            {% csrf_token %}
+
+            <!-- Username Field -->
+            <div style="display: flex; flex-direction: column;">
+                <label for="{{ form.username.id_for_label }}" style="color: #2A3A30; font-weight: bold; margin-bottom: 5px;">Username</label>
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default_if_none:'' }}" style="padding: 12px; height: 45px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                        <p style="color: red; font-size: 12px; margin-top: 2px;">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Password Field -->
+            <div style="display: flex; flex-direction: column;">
+                <label for="{{ form.password.id_for_label }}" style="color: #2A3A30; font-weight: bold; margin-bottom: 5px;">Password</label>
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" style="padding: 12px; height: 45px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;">
+
+                {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                        <p style="color: red; font-size: 12px; margin-top: 2px;">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Alert Message (if any) -->
+            {% if messages %}
+                <div style="color: white; background-color: #f44336; padding: 8px; border-radius: 5px; margin-top: 15px; text-align: center; font-size: 14px;">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Submit Button -->
+            <div style="display: flex; justify-content: center; margin-top: 10px;">
+                <button type="submit" style="background-color: #8A6240; color: #FFF; padding: 15px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; width: 100%;">
+                    Login
+                </button>
+            </div>
+        </form>
+
+        <!-- Register Link -->
+        <div style="text-align: center; margin-top: 10px;">
+            <p style="font-size: 14px; color: #2A3A30;">
+                Don't have an account? 
+                <a href="{% url 'register' %}" style="color: #b48125; font-weight: bold; text-decoration: underline;">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock content %}
