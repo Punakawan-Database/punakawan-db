@@ -1,48 +1,70 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block meta %}
     <title>Diskon</title>
 {% endblock meta %}
 
 {% block content %}
-<!-- {% include 'navbar.html' %} -->
-
-<div class="min-h-screen bg-blue-600 py-8 px-4">
+{% include 'navbar.html' %}
+<div class="min-h-screen bg-blue-600 py-8 px-4 pt-16">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold text-white mb-4">Punakawan DB</h2>
-            <p class="text-white/90">Discount Voucher System</p>
+            <h2 class="text-4xl font-bold text-white mb-4">Discount Voucher System</h2>
+            <p class="text-white/90">Punakawan DB</p>
         </div>
 
         <!-- Voucher Section -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h3 class="text-xl font-semibold mb-4 text-gray-800">Voucher</h3>
             
-            <!-- Voucher Input Rows -->
-            {% for i in '123'|make_list %}
+            <!-- Voucher Header -->
+            <div class="grid grid-cols-7 gap-4 mb-4 items-center">
+                <div class="col-span-1">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Kode</p>
+                </div>
+                <div class="col-span-1">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Potongan</p>
+                </div>
+                <div class="col-span-1">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Minimal Transaksi</p>
+                </div>
+                <div class="col-span-1">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Jumlah Hari Berlaku</p>
+                </div>
+                <div class="col-span-1">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Kuota Penggunaan</p>
+                </div>
+                <div class="col-span-1">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Harga</p>
+                </div>
+            </div>
+
+            <!-- Voucher Rows -->
+            {% for voucher in vouchers %}
             <div class="grid grid-cols-7 gap-4 mb-4">
                 <div class="col-span-1">
-                    <input type="text" placeholder="Kode" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.kode }}</p>
                 </div>
                 <div class="col-span-1">
-                    <input type="text" placeholder="Potongan" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.potongan }}</p>
                 </div>
                 <div class="col-span-1">
-                    <input type="number" placeholder="Min Transaksi" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.min_transaksi }}</p>
                 </div>
                 <div class="col-span-1">
-                    <input type="number" placeholder="Jumlah Hari" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.jumlah_hari }}</p>
                 </div>
                 <div class="col-span-1">
-                    <input type="number" placeholder="Kuota" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.kuota }}</p>
                 </div>
                 <div class="col-span-1">
-                    <input type="number" placeholder="Harga" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.harga }}</p>
                 </div>
                 <div class="col-span-1">
                     <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                        Button Beli
+                        Beli
                     </button>
                 </div>
             </div>
@@ -52,15 +74,25 @@
         <!-- Promo Section -->
         <div class="bg-white rounded-lg shadow-lg p-6">
             <h3 class="text-xl font-semibold mb-4 text-gray-800">Promo</h3>
-            
-            <!-- Promo Input Rows -->
-            {% for i in '123'|make_list %}
-            <div class="grid grid-cols-2 gap-4 mb-4">
+
+            <!-- Promo Header -->
+            <div class="grid grid-cols-5 gap-4 mb-4 items-center">
                 <div class="col-span-1">
-                    <input type="text" placeholder="Kode" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Kode</p>
                 </div>
+                <div class="col-span-4">
+                    <p class="w-full px-3 py-2 text-center text-gray-500">Tanggal Akhir Berlaku</p>
+                </div>
+            </div>
+            
+            <!-- Promo Rows -->
+            {% for promo in promos %}
+            <div class="grid grid-cols-5 gap-4 mb-4">
                 <div class="col-span-1">
-                    <input type="date" placeholder="Tanggal Akhir Berlaku" class="w-full px-3 py-2 border rounded-md">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ promo.kode }}</p>
+                </div>
+                <div class="col-span-4">
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ promo.tanggal_akhir }}</p>
                 </div>
             </div>
             {% endfor %}
