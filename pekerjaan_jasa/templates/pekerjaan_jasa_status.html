@@ -13,19 +13,19 @@
                     <div class="flex-1">
                         <input type="text"
                                placeholder="Nama Jasa"
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                               class="search-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                     </div>
                     <div class="w-64">
-                        <select class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                        <select class="status-select w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                             <option value="">Status Pesanan</option>
-                            <option value="menunggu_pekerja_berangkat">Menunggu Pekerja Berangkat</option>
-                            <option value="pekerja_tiba_di_lokasi">Pekerja Tiba di Lokasi</option>
-                            <option value="pemesanan_jasa_sedang_dilakukan">Pemesanan Jasa Sedang Dilakukan</option>
-                            <option value="pelayanan_selesai">Pelayanan Selesai</option>
-                            <option value="pesanan_dibatalkan">Pesanan Dibatalkan</option>
+                            <option value="ST01">Menunggu Pekerja Berangkat</option>
+                            <option value="ST02">Pekerja Tiba di Lokasi</option>
+                            <option value="ST03">Pemesanan Jasa Sedang Dilakukan</option>
+                            <option value="ST04">Pelayanan Selesai</option>
+                            <option value="ST05">Pesanan Dibatalkan</option>
                         </select>
                     </div>
-                    <button class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium">
+                    <button class="filter-button bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium">
                         Cari
                     </button>
                 </div>
@@ -33,12 +33,12 @@
             <!-- Orders List -->
             <div class="space-y-6">
                 {% for ps in pesanan %}
-                    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-200">
+                    <div class="order-card bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-200">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="space-y-4">
                                 <div>
                                     <div class="text-gray-600 mb-1">Nama Subkategori Pesanan</div>
-                                    <div class="font-medium text-lg">{{ ps.subkategori }}</div>
+                                    <div class="subkategori font-medium text-lg">{{ ps.subkategori }}</div>
                                 </div>
                                 <div>
                                     <div class="text-gray-600 mb-1">Nama Pelanggan</div>
@@ -65,11 +65,13 @@
                                 <div class="flex items-center justify-between gap-4">
                                     <div class="flex flex-col flex-1">
                                         <div class="text-gray-600">Status Pesanan</div>
-                                        <div class="font-medium text-lg text-blue-800">{{ ps.status_pesanan }}</div>
+                                        <div class="status-text font-medium text-lg text-blue-800">{{ ps.status_pesanan }}</div>
                                     </div>
-                                    <button class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition duration-200 font-medium whitespace-nowrap flex-shrink-0">
-                                        Update Status
-                                    </button>
+                                    {% if ps.status_pesanan != "Pelayanan Selesai" and ps.status_pesanan != "Pesanan Dibatalkan" %}
+                                        <button class="update-status-button bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition duration-200 font-medium whitespace-nowrap flex-shrink-0">
+                                            Update Status
+                                        </button>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -78,4 +80,64 @@
             </div>
         </div>
     </div>
+    <script>
+        function getNextStatus(currentStatus) {
+            const statusFlow = {
+                "Menunggu Pekerja Berangkat": "Pekerja Tiba di Lokasi",
+                "Pekerja Tiba di Lokasi": "Pemesanan Jasa Sedang Dilakukan",
+                "Pemesanan Jasa Sedang Dilakukan": "Pelayanan Selesai"
+            };
+            return statusFlow[currentStatus] || currentStatus;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Status update functionality
+            const orderCards = document.querySelectorAll('.order-card');
+            
+            orderCards.forEach(card => {
+                const statusElement = card.querySelector('.status-text');
+                const updateButton = card.querySelector('.update-status-button');
+                
+                if (updateButton && statusElement) {
+                    updateButton.addEventListener('click', () => {
+                        const currentStatus = statusElement.textContent.trim();
+                        const nextStatus = getNextStatus(currentStatus);
+                        
+                        statusElement.textContent = nextStatus;
+                        
+                        if (nextStatus === "Pelayanan Selesai") {
+                            updateButton.style.display = "none";
+                        }
+                    });
+                }
+            });
+
+            // Filter functionality
+            const searchInput = document.querySelector('.search-input');
+            const statusSelect = document.querySelector('.status-select');
+            const filterButton = document.querySelector('.filter-button');
+
+            filterButton.addEventListener('click', () => {
+                const searchText = searchInput.value.toLowerCase().trim();
+                const selectedStatus = statusSelect.value;
+
+                orderCards.forEach(card => {
+                    const subkategori = card.querySelector('.subkategori').textContent.toLowerCase().trim();
+                    const status = card.querySelector('.status-text').textContent.trim();
+                    const statusCode = {
+                        "Menunggu Pekerja Berangkat": "ST01",
+                        "Pekerja Tiba di Lokasi": "ST02",
+                        "Pemesanan Jasa Sedang Dilakukan": "ST03",
+                        "Pelayanan Selesai": "ST04",
+                        "Pesanan Dibatalkan": "ST05"
+                    }[status];
+
+                    const nameMatch = !searchText || subkategori.includes(searchText);
+                    const statusMatch = !selectedStatus || statusCode === selectedStatus;
+                    
+                    card.style.display = (nameMatch && statusMatch) ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
 {% endblock content %}
