@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="max-w-6xl mx-auto">
+        <!-- Filter Header -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex gap-4 items-center">
+                <div class="w-48">
+                    <select class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Kategori</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="w-48">
+                    <select class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Subkategori</option>
+                        {% for subcategory in subcategories %}
+                            <option value="{{ subcategory.id }}">{{ subcategory.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Service Orders List -->
+        <div class="space-y-4">
+            {% for order in orders %}
+            <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition duration-200">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                        <div class="text-sm text-gray-600">Nama Subkategori Pesanan</div>
+                        <div class="font-medium">{{ order.subcategory_name }}</div>
+                        
+                        <div class="text-sm text-gray-600">Nama Pelanggan</div>
+                        <div class="font-medium">{{ order.customer_name }}</div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <div class="text-sm text-gray-600">Tanggal Pemesanan</div>
+                        <div class="font-medium">{{ order.order_date }}</div>
+                        
+                        <div class="text-sm text-gray-600">Tanggal Pekerjaan</div>
+                        <div class="font-medium">{{ order.work_date }}</div>
+                    </div>
+                    
+                    <div class="col-span-2 md:col-span-1 flex justify-between items-center">
+                        <div>
+                            <div class="text-sm text-gray-600">Total Biaya</div>
+                            <div class="text-lg font-semibold text-blue-600">Rp {{ order.total_cost }}</div>
+                        </div>
+                        
+                        <div class="text-right">
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                                Kerjakan Pesanan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

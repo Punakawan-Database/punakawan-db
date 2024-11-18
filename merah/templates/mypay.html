@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto">
+        <!-- Account Info Header -->
+        <div class="flex gap-4 items-center mb-6">
+            <div class="flex-1 bg-white rounded-lg shadow-md p-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-600">No HP</div>
+                        <div class="font-medium text-lg">{{ account.phone_number }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">Saldo</div>
+                        <div class="font-semibold text-lg text-blue-600">Rp {{ account.balance|floatformat:0 }}</div>
+                    </div>
+                </div>
+            </div>
+            <button class="bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition duration-200 whitespace-nowrap">
+                Lakukan Transaksi
+            </button>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h2 class="text-lg font-semibold mb-4">Riwayat Transaksi</h2>
+            
+            <div class="space-y-2">
+                {% for transaction in transactions %}
+                <div class="border rounded-lg p-4 hover:bg-gray-50 transition duration-200">
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <div>
+                            <div class="font-medium {% if transaction.is_credit %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ transaction.is_credit|yesno:"+,-" }} Rp {{ transaction.amount|floatformat:0 }}
+                            </div>
+                        </div>
+                        
+                        <div class="text-gray-600">
+                            {{ transaction.date|date:"d M Y" }}
+                        </div>
+                        
+                        <div class="text-gray-800">
+                            {{ transaction.category }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-gray-500 py-4">
+                    Tidak ada transaksi
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
