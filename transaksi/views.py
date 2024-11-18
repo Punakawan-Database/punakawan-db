@@ -96,4 +96,56 @@ def mypay(request):
 
 
 def mypay_transaksi(request):
-    return render(request, "mypay_transaksi.html")
+    context = {
+        "user": {
+            "role": "pengguna",
+            "nama": "John Doe",
+            "no_hp": "085172239073",
+            "saldo": 1000000000,
+        },
+        "bank": [
+            {
+                "id": 1,
+                "nama": "BCA",
+            },
+            {
+                "id": 1,
+                "nama": "BNI",
+            },
+            {
+                "id": 1,
+                "nama": "BRI",
+            },
+            {
+                "id": 1,
+                "nama": "MANDIRI",
+            },
+            {
+                "id": 1,
+                "nama": "Cimb Niaga",
+            },
+        ],
+        "jasa": [
+            {
+                "id": 1,
+                "nama": "Setrika",
+                "harga": 20000,
+            },
+            {
+                "id": 2,
+                "nama": "Cuci Baju",
+                "harga": 30000,
+            },
+            {
+                "id": 3,
+                "nama": "Bersih Kamar",
+                "harga": 40000,
+            },
+            {
+                "id": 4,
+                "nama": "Sapu Halaman",
+                "harga": 50000,
+            },
+        ],
+    }
+    return render(request, "mypay_transaksi.html", context)
