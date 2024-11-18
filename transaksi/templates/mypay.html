@@ -1,1 +1,57 @@
-
+{% extends "base.html" %}
+{% block content %}
+    <div class="min-h-screen bg-blue-600">
+        <!-- Main Content Container -->
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <!-- Welcome Section -->
+            <div class="text-center text-white mb-8">
+                <h1 class="text-4xl font-bold mb-2">Account Dashboard</h1>
+                <p class="text-xl">Welcome back, {{ user.nama }} !</p>
+            </div>
+            <!-- Account Info Card -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <div class="text-gray-600 text-sm">No HP</div>
+                        <div class="text-2xl font-semibold">{{ user.no_hp }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-600 text-sm">Saldo</div>
+                        <div class="text-2xl font-semibold text-blue-600">Rp {{ user.saldo|floatformat:0 }}</div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                        Lakukan Transaksi
+                    </button>
+                </div>
+            </div>
+            <!-- Transaction History -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-6">Riwayat Transaksi</h2>
+                <div class="space-y-4">
+                    {% for tr in transaksi %}
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <span class="{% if tr.kategori == 'TopUp MyPay' %}text-green-600{% else %}text-red-600{% endif %} font-semibold text-lg">
+                                        {% if tr.kategori == 'TopUp MyPay' %}
+                                            +
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                        Rp {{ tr.nominal|floatformat:0 }}
+                                    </span>
+                                </div>
+                                <div class="text-gray-600">{{ tr.tanggal|date:"d M Y" }}</div>
+                                <div class="text-gray-800 font-medium">{{ tr.kategori }}</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center text-gray-500 py-8">Tidak ada transaksi</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
