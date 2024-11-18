@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "main",
     "authentication",
     "transaksi",
+    "pekerjaan_jasa",
 ]
 
 MIDDLEWARE = [

@@ -23,4 +23,5 @@ urlpatterns = [
     path("", include("main.urls")),
     path("", include("authentication.urls")),
     path("", include("transaksi.urls")),
+    path("", include("pekerjaan_jasa.urls")),
 ]
