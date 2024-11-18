@@ -34,10 +34,35 @@
         {% endif %}
 
         {% if pemesanan_jasa.get_status_display == "Pesanan Selesai" %}
-        <button>Buat Testimoni</button>
+        <button onclick="testimoni()">Buat Testimoni</button>
         {% endif %}
 
         <br>
         {% endfor %}
     </div>
+
+    <div id="new-testimoni"></div>
 </body>
+
+<script>
+    function testimoni() {
+        document.getElementById("new-testimoni").innerHTML = `
+            <div >
+                <h1>Create Testimonial</h1>
+                <div>
+                    <label for="rating">Rating</label>
+                    <input type="range" id="rating" name="rating" min="1" max="10">
+                </div>
+                <div class="mb-4">
+                    <label for="comment">Comment</label>
+                    <textarea id="comment" name="comment" rows="3"></textarea>
+                </div>
+                <button type="submit" onclick="closemodal()" >Submit</button>
+            </div>
+        `;
+    }
+
+    function closemodal() {
+        document.getElementById("new-testimoni").innerHTML = "";
+    }
+</script>
