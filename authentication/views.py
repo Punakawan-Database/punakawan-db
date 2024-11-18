@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 
 def register(request):
     return render(request, 'register.html')
-
+  
 def register_user(request):
     return render(request, 'register_user.html')
 

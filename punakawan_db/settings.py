@@ -33,14 +33,16 @@ AUTH_USER_MODEL = "authentication.CustomUser"
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "main",
-    "authentication",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'homepage',
+    'main',
+    'authentication',
+    'Diskon',
     "transaksi",
     "pekerjaan_jasa",
 ]
