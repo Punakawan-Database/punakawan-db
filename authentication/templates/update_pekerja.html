@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Form Input</title>
+{% endblock meta %}
+
+{% block content %}
+{% include 'navbar_pekerja.html' %}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center py-8 px-4">
+  <div class="mt-10 bg-white/95 shadow-2xl rounded-2xl p-6 w-full max-w-2xl transform hover:scale-[1.02] transition-all duration-300">
+    <div class="flex items-center space-x-4 mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">Form Input</h2>
+      </div>
+    </div>
+
+    <form method="POST" class="space-y-4">
+      {% csrf_token %}
+      
+      <div class="space-y-3">
+        <!-- Nama -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">Nama :</label>
+          <input type="text" name="nama" id="nama"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+
+        <!-- Jenis Kelamin -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">Jenis Kelamin :</label>
+          <div class="flex space-x-4">
+            <label class="inline-flex items-center">
+              <input type="radio" name="gender" value="L" class="form-radio">
+              <span class="ml-2">L</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="radio" name="gender" value="P" class="form-radio">
+              <span class="ml-2">P</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- No HP -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">No HP :</label>
+          <input type="tel" name="no_hp" id="no_hp"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+
+        <!-- Tanggal Lahir -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">Tanggal Lahir :</label>
+          <input type="date" name="tanggal_lahir" id="tanggal_lahir"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+
+        <!-- Alamat -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">Alamat :</label>
+          <input type="text" name="alamat" id="alamat"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+
+        <!-- Nama Bank -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">Nama Bank :</label>
+          <select name="nama_bank" id="nama_bank"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <option value="">Select Bank</option>
+            <option value="BCA">BCA</option>
+            <option value="Mandiri">Mandiri</option>
+            <option value="BNI">BNI</option>
+            <option value="BRI">BRI</option>
+          </select>
+        </div>
+
+        <!-- No Rekening -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">No Rekening :</label>
+          <input type="text" name="no_rekening" id="no_rekening"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+
+        <!-- NPWP -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">NPWP :</label>
+          <input type="text" name="npwp" id="npwp"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+
+        <!-- URL Foto -->
+        <div class="flex items-center">
+          <label class="block text-gray-700 w-32">URL Foto :</label>
+          <input type="url" name="url_foto" id="url_foto"
+                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                 required>
+        </div>
+      </div>
+
+      <div class="flex justify-center mt-6">
+        <button type="submit" 
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg
+                       shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200
+                       text-sm">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

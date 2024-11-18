@@ -1,0 +1,106 @@
+{% load static %}
+<nav id="navbar" class="fixed top-0 left-0 z-50 w-full transition duration-300 ease-in-out bg-transparent backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Left side - Brand and Role -->
+      <div class="flex items-center">
+        <span class="text-white font-semibold mr-4">Role: Pekerja</span>
+      </div>
+
+      <!-- Center - Main Navigation -->
+      <div id="navLinks" class="flex items-center space-x-6">
+        <a href="" class="nav-link">Homepage</a>
+        <a href="" class="nav-link">Kelola Pekerjaan</a>
+        <a href="" class="nav-link">Status Pekerjaan</a>
+        <a href="" class="nav-link">MyPay</a>
+      </div>
+
+      <!-- Right side - Profile Dropdown -->
+      <div class="relative">
+        <button id="profileDropdown" class="nav-link flex items-center">
+          <span class="mr-2">{{ user.username }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+            <a href="{% url 'profile_pekerja' %}" class="dropdown-item">Profile</a>
+            <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const profileDropdownButton = document.getElementById("profileDropdown");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const navLinks = document.getElementById("navLinks").querySelectorAll(".nav-link");
+
+    // Toggle the dropdown visibility
+    profileDropdownButton.addEventListener("click", () => {
+      dropdownMenu.classList.toggle("hidden");
+    });
+
+    // Close the dropdown if clicked outside of it
+    window.addEventListener("click", (event) => {
+      if (!profileDropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.add("hidden");
+      }
+    });
+
+    // Navbar background and link color change on scroll
+    window.addEventListener("scroll", () => {
+      const navbar = document.getElementById("navbar");
+      
+      if (window.scrollY > 50) {
+        navbar.classList.remove("bg-transparent");
+        navbar.classList.add("backdrop-blur-md");
+        
+        // Change nav links to blue
+        navLinks.forEach(link => link.classList.add("text-blue-500"));
+      } else {
+        navbar.classList.add("bg-transparent");
+        navbar.classList.remove("backdrop-blur-md");
+
+        // Revert nav links to white
+        navLinks.forEach(link => link.classList.remove("text-blue-500"));
+      }
+    });
+  });
+</script>
+
+<style>
+  .nav-link {
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link:hover {
+    background-color: rgba(59, 130, 246, 0.5);
+    transform: translateY(-1px);
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: #1f2937;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #047857; /* Changed to emerald color */
+  }
+
+  .text-blue-500 {
+    color: #3b82f6 !important; /* Tailwind blue */
+  }
+</style>

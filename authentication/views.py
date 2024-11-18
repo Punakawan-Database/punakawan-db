@@ -14,8 +14,7 @@ from django.contrib.auth.models import User
 
 def register(request):
     return render(request, 'register.html')
-
-
+  
 def register_user(request):
     return render(request, 'register_user.html')
 
@@ -29,10 +28,10 @@ def login_user(request):
 
         # Dummy authentication for testing purposes
         if (no_hp == '2' and password == 'pengguna'):
-            return redirect('main_pengguna')
+            return render(request, 'main_pengguna.html')  # Render the pengguna template
 
         elif (no_hp == '1' and password == 'pekerja'):
-            return redirect('main_pekerja')
+            return render(request, 'main_pekerja.html')  # Render the pekerja template
 
         # If authentication failed for both
         else:
@@ -154,10 +153,21 @@ def customer_blog(request):
 def admin_dashboard(request):
     return render(request, 'main_admin.html')
 
-@login_required
-def profile(request):
+def profile_pengguna(request):
     user = request.user
-    return render(request, 'user_profile.html', {'user': user})
+    return render(request, 'profile_pengguna.html', {'user': user})
+
+def profile_pekerja(request):
+    user = request.user
+    return render(request, 'profile_pekerja.html', {'user': user})
+
+def update_pengguna(request):
+    user = request.user
+    return render(request, 'update_pengguna.html')
+
+def update_pekerja(request):
+    user = request.user
+    return render(request, 'update_pekerja.html')
 
 def logout_user(request):
     logout(request)
