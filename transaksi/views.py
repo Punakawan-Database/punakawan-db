@@ -45,7 +45,7 @@ def mypay(request):
         FROM pengguna p
         WHERE p.id = %s
         """,
-        curr_user["id"],
+        [curr_user["id"]],
     )
 
     if user_result is None:
@@ -66,7 +66,7 @@ def mypay(request):
         WHERE tr.userid = %s
         ORDER BY tr.tgl DESC
         """,
-        curr_user["id"],
+        [curr_user["id"]],
     )
 
     context = {
