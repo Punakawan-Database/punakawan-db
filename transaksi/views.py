@@ -3,17 +3,17 @@ from django.shortcuts import render
 
 from utils import db
 
-logged_user = {
-    "id": "65ae2c07-9011-4a53-bd88-73a6b577691d",
-    "role": "pekerja",
-    "nama": "Jhon Doe",
-}
-
 # logged_user = {
-#     "id": "fasdfasdfa-9011-4a53-bd88-73a6b577691d",
-#     "role": "pengguna",
-#     "nama": "Jono Doe",
+#     "id": "65ae2c07-9011-4a53-bd88-73a6b577691d",
+#     "role": "pekerja",
+#     "nama": "Jhon Doe",
 # }
+
+logged_user = {
+    "id": "d02eee9e-83a4-4e42-9ffe-3defcab6d447",
+    "role": "pelanggan",
+    "nama": "Jono Doe",
+}
 
 # context = {
 #     "user": {
@@ -31,6 +31,27 @@ logged_user = {
 #     ],
 # }
 
+# context = {
+#     "user": {
+#         "role": "pengguna",
+#         "nama": "John Doe",
+#         "no_hp": "085172239073",
+#         "saldo": 1000000000,
+#     },
+#     "bank": [
+#         {
+#             "id": 1,
+#             "nama": "BCA",
+#         }
+#     "jasa": [
+#         {
+#             "id": 1,
+#             "nama": "Setrika",
+#             "harga": 20000,
+#         }
+#     ],
+# }
+
 
 def mypay(request):
     curr_user = logged_user
@@ -42,7 +63,7 @@ def mypay(request):
             p.nama AS nama,
             p.nohp AS no_hp,
             p.saldomypay AS saldo
-        FROM pengguna p
+        FROM PENGGUNA p
         WHERE p.id = %s
         """,
         [curr_user["id"]],
@@ -83,56 +104,61 @@ def mypay(request):
 
 
 def mypay_transaksi(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    user_result = db.query_one(
+        """
+        SELECT
+            p.nama AS nama,
+            p.nohp AS no_hp,
+            p.saldomypay AS saldo
+        FROM PENGGUNA p
+        WHERE p.id = %s
+        """,
+        [curr_user["id"]],
+    )
+
+    if user_result is None:
+        raise Http404("User not found")
+
     context = {
         "user": {
-            "role": "pengguna",
-            "nama": "John Doe",
-            "no_hp": "085172239073",
-            "saldo": 1000000000,
+            "role": curr_user["role"],
+            "nama": user_result["nama"],
+            "no_hp": user_result["no_hp"],
+            "saldo": user_result["saldo"],
         },
-        "bank": [
-            {
-                "id": 1,
-                "nama": "BCA",
-            },
-            {
-                "id": 1,
-                "nama": "BNI",
-            },
-            {
-                "id": 1,
-                "nama": "BRI",
-            },
-            {
-                "id": 1,
-                "nama": "MANDIRI",
-            },
-            {
-                "id": 1,
-                "nama": "Cimb Niaga",
-            },
-        ],
-        "jasa": [
-            {
-                "id": 1,
-                "nama": "Setrika",
-                "harga": 20000,
-            },
-            {
-                "id": 2,
-                "nama": "Cuci Baju",
-                "harga": 30000,
-            },
-            {
-                "id": 3,
-                "nama": "Bersih Kamar",
-                "harga": 40000,
-            },
-            {
-                "id": 4,
-                "nama": "Sapu Halaman",
-                "harga": 50000,
-            },
-        ],
     }
+
+    if curr_user["role"] == "pelanggan":
+        jasa_results = db.query_all(
+            """
+            SELECT
+                skj.id AS id,
+                skj.namasubkategori AS nama,
+                tpj.tglpemesanan AS tgl,
+                tpj.totalbiaya AS total_biaya
+            FROM TR_PEMESANAN_JASA tpj
+                JOIN PELANGGAN pl
+                    ON pl.id = tpj.idpelanggan
+                JOIN SESI_LAYANAN sl
+                    ON sl.sesi = tpj.sesi AND sl.subkategoriid = tpj.idkategorijasa
+                JOIN SUBKATEGORI_JASA skj
+                    ON skj.id = sl.subkategoriid
+            WHERE pl.id = %s
+            """,
+            [curr_user["id"]],
+        )
+
+        context = {
+            "user": {
+                "role": curr_user["role"],
+                "nama": user_result["nama"],
+                "no_hp": user_result["no_hp"],
+                "saldo": user_result["saldo"],
+            },
+            "jasa": jasa_results,
+        }
+
     return render(request, "mypay_transaksi.html", context)
