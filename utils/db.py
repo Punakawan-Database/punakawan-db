@@ -17,15 +17,15 @@ def _dictfetchall(cursor):
     return [dict(zip(columns, row)) for row in rows]
 
 
-def query_one(statement, *args):
+def query_one(statement, params=None):
     with connection.cursor() as cursor:
         cursor.execute("SET SEARCH_PATH TO basdat")
-        cursor.execute(statement, args)
+        cursor.execute(statement, params or [])
         return _dictfetchone(cursor)
 
 
-def query_all(statement, *args):
+def query_all(statement, params=None):
     with connection.cursor() as cursor:
         cursor.execute("SET SEARCH_PATH TO basdat")
-        cursor.execute(statement, args)
+        cursor.execute(statement, params or [])
         return _dictfetchall(cursor)
