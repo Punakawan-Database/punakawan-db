@@ -146,7 +146,13 @@ def mypay_transaksi(request):
                     ON sl.sesi = tpj.sesi AND sl.subkategoriid = tpj.idkategorijasa
                 JOIN SUBKATEGORI_JASA skj
                     ON skj.id = sl.subkategoriid
-            WHERE pl.id = %s
+                JOIN TR_PEMESANAN_STATUS tps
+                    ON tps.idtrpemesanan = tpj.id
+                JOIN STATUS_PESANAN sp
+                    ON sp.id = tps.idstatus
+            WHERE
+                sp.status = 'Menunggu Pembayaran'
+                AND pl.id = %s
             """,
             [curr_user["id"]],
         )
