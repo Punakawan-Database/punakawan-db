@@ -13,28 +13,16 @@
                     <div class="flex-1 min-w-[16rem]">
                         <select class="select-kategori w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                             <option value="">Pilih Kategori</option>
-                            <option value="HC">Home Cleaning</option>
-                            <option value="DC">Deep Cleaning</option>
-                            <option value="SA">Service AC</option>
-                            <option value="ME">Message</option>
-                            <option value="HI">Hair Care</option>
+                            {% for kt in kategori %}<option value="{{ kt.id_kategori }}">{{ kt.nama_kategori }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="flex-1 min-w-[16rem]">
                         <select class="select-subkategori w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                             <option value="">Pilih Subkategori</option>
-                            <!-- Home Cleaning Subkategori -->
-                            <option value="HC01">Daily Cleaning</option>
-                            <option value="HC02">Setrika</option>
-                            <option value="HC03">Pembersihan dapur dan kulkas</option>
-                            <option value="HC04">Kombo daily cleaning + setrika</option>
-                            <option value="HC05">Kombo daily cleaning + dapur</option>
-                            <!-- Deep Cleaning Subkategori -->
-                            <option value="DC01">Cuci Kasur</option>
-                            <option value="DC02">Cuci Sofa</option>
-                            <option value="DC03">Cuci Karpet</option>
-                            <option value="DC04">Cuci Tirai</option>
-                            <option value="DC05">Bersih kamar mandi</option>
+                            {% for skt in subkategori %}
+                                <option value="{{ skt.id_subkategori }}"
+                                        data-kategori="{{ skt.id_kategori }}">{{ skt.nama_subkategori }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <button class="filter-button bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium flex-shrink-0">
@@ -45,7 +33,7 @@
             <!-- Service Orders List -->
             <div class="space-y-6">
                 {% for ps in pesanan %}
-                    <div class="order-card bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-200">
+                    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-200">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="space-y-4">
                                 <div>
@@ -87,15 +75,6 @@
             const categorySelect = document.querySelector('.select-kategori');
             const subcategorySelect = document.querySelector('.select-subkategori');
             const filterButton = document.querySelector('.filter-button');
-            const orderCards = document.querySelectorAll('.order-card');
-            
-            const subcategoriesMap = {
-                'HC': ['HC01', 'HC02', 'HC03', 'HC04', 'HC05'],
-                'DC': ['DC01', 'DC02', 'DC03', 'DC04', 'DC05'],
-                'SA': [],
-                'ME': [],
-                'HI': []
-            };
 
             const allSubcategoryOptions = subcategorySelect.querySelectorAll('option:not(:first-child)');
     
@@ -113,42 +92,11 @@
                         option.style.display = '';
                     });
                 } else {
-                    const relevantSubcategories = subcategoriesMap[selectedCategory];
                     allSubcategoryOptions.forEach(option => {
-                        option.style.display = relevantSubcategories.includes(option.value) ? '' : 'none';
+                        option.style.display = option.dataset.kategori === selectedCategory ? '' : 'none';
                     });
                 }
             });
-    
-            // Filter button click handler
-            filterButton.addEventListener('click', () => {
-                const selectedCategory = categorySelect.value;
-                const selectedSubcategory = subcategorySelect.value;
-    
-                orderCards.forEach(card => {
-                    const subkategori = card.querySelector('.font-medium').textContent.trim();
-                    
-                    // If no filters selected, show all cards
-                    if (!selectedCategory && !selectedSubcategory) {
-                        card.style.display = 'block';
-                        return;
-                    }
-    
-                    // Get subcategory ID based on name
-                    const subcategoryId = Object.entries(subcategoriesMap)
-                        .flatMap(([category, subcategories]) => 
-                            subcategories.find(id => {
-                                const option = subcategorySelect.querySelector(`option[value="${id}"]`);
-                                return option && option.textContent === subkategori;
-                            })
-                        )[0];
-    
-                    const matchesCategory = !selectedCategory || subcategoryId?.startsWith(selectedCategory);
-                    const matchesSubcategory = !selectedSubcategory || subcategoryId === selectedSubcategory;
-    
-                    card.style.display = (matchesCategory && matchesSubcategory) ? 'block' : 'none';
-                })
-            })
         });
     </script>
 {% endblock content %}

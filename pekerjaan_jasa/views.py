@@ -1,131 +1,132 @@
 from django.shortcuts import render
 
+from utils import db
 
+logged_user = {
+    "id": "65ae2c07-9011-4a53-bd88-73a6b577691d",
+    "role": "pekerja",
+    "nama": "Jhon Doe",
+}
+
+# context = {
+#     "pesanan": [
+#         {
+#             "subkategori": "Daily Cleaning",
+#             "pelanggan": "Ahmad Fauzi",
+#             "tanggal_pemesanan": "19-10-2020",
+#             "tanggal_pekerjaan": "19-10-2023",
+#             "total_biaya": 10000,
+#         },
+#     ],
+# }
+
+# context = {
+#     "pesanan": [
+#         {
+#             "subkategori": "Setrika",
+#             "nama_pelanggan": "Jono Dewoto",
+#             "tanggal_pemesanan": "19-10-2020",
+#             "tanggal_pekerjaan": "19-10-2023",
+#             "total_biaya": 10000,
+#             "status_pesanan": "Menunggu Pekerja Berangkat",
+#         },
+#     ]
+# }
+
+
+# TODO: Add Search Filter Form
 def pekerjaan_jasa(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    category_filter = request.GET.get("kategori")
+    subcategory_filter = request.GET.get("subkategori")
+
+    category_results = db.query_all(
+        """
+        SELECT
+            kj.id AS id_kategori,
+            kj.namakategori AS nama_kategori,
+            skj.id AS id_subkategori,
+            skj.namasubkategori AS nama_subkategori
+        FROM PEKERJA pk
+            JOIN PEKERJA_KATEGORI_JASA pkj
+                ON pkj.pekerjaid = pk.id
+            JOIN KATEGORI_JASA kj
+                ON kj.id = pkj.kategorijasaid
+            JOIN SUBKATEGORI_JASA skj
+                ON skj.kategorijasaid = kj.id
+        WHERE pk.id = %s
+        """,
+        [curr_user["id"]],
+    )
+
+    orders_statement = """
+        SELECT
+            skj.namasubkategori AS subkategori,
+            ppl.nama AS nama_pelanggan,
+            tpj.tglpemesanan AS tanggal_pemesanan,
+            tpj.tglpekerjaan AS tanggal_pekerjaan,
+            tpj.totalbiaya AS total_biaya
+        FROM TR_PEMESANAN_JASA tpj
+            JOIN PELANGGAN pl
+                ON pl.id = tpj.idpelanggan
+            JOIN PENGGUNA ppl
+                ON ppl.id = pl.id
+            JOIN SESI_LAYANAN sl
+                ON sl.subkategoriid = tpj.idkategorijasa
+                AND sl.sesi = tpj.sesi
+            JOIN SUBKATEGORI_JASA skj
+                ON skj.id = sl.subkategoriid
+            JOIN KATEGORI_JASA kj
+                ON kj.id = skj.kategorijasaid
+            JOIN TR_PEMESANAN_STATUS tps
+                ON tps.idtrpemesanan = tpj.id
+            JOIN STATUS_PESANAN sp
+                ON sp.id = tps.idstatus
+        WHERE
+            sp.status = 'Mencari Pekerja Terdekat'
+            AND skj.id IN (
+                SELECT
+                    skj.id
+                FROM PEKERJA pk
+                    JOIN PEKERJA_KATEGORI_JASA pkj
+                        ON pkj.pekerjaid = pk.id
+                    JOIN KATEGORI_JASA kj
+                        ON kj.id = pkj.kategorijasaid
+                    JOIN SUBKATEGORI_JASA skj
+                        ON skj.kategorijasaid = kj.id
+                WHERE pk.id = %s
+            )
+    """
+
+    orders_params = [curr_user["id"]]
+    orders_conditions = []
+
+    if category_filter:
+        orders_conditions.append("kj.namakategori = %s")
+        orders_params.append(category_filter)
+
+    if subcategory_filter:
+        orders_conditions.append("skj.namasubkategori = %s")
+        orders_params.append(subcategory_filter)
+
+    if orders_conditions:
+        orders_statement += " AND " + " AND ".join(orders_conditions)
+
+    order_results = db.query_all(orders_statement, orders_params)
+
     context = {
-        "pesanan": [
-            {
-                "subkategori": "Daily Cleaning",
-                "nama_pelanggan": "Ahmad Fauzi",
-                "tanggal_pemesanan": "19-10-2020",
-                "tanggal_pekerjaan": "19-10-2023",
-                "total_biaya": 10000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Setrika",
-                "nama_pelanggan": "Budi Hartono",
-                "tanggal_pemesanan": "19-10-2020",
-                "tanggal_pekerjaan": "19-10-2023",
-                "total_biaya": 12000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Pembersihan dapur dan kulkas",
-                "nama_pelanggan": "Citra Dewi",
-                "tanggal_pemesanan": "19-10-2020",
-                "tanggal_pekerjaan": "19-10-2023",
-                "total_biaya": 15000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Kombo daily cleaning + setrika",
-                "nama_pelanggan": "Dian Prasetyo",
-                "tanggal_pemesanan": "20-10-2020",
-                "tanggal_pekerjaan": "20-10-2023",
-                "total_biaya": 20000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Kombo daily cleaning + dapur",
-                "nama_pelanggan": "Eka Sari",
-                "tanggal_pemesanan": "21-10-2020",
-                "tanggal_pekerjaan": "21-10-2023",
-                "total_biaya": 25000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Kasur",
-                "nama_pelanggan": "Fajar Nugroho",
-                "tanggal_pemesanan": "22-10-2020",
-                "tanggal_pekerjaan": "22-10-2023",
-                "total_biaya": 30000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Sofa",
-                "nama_pelanggan": "Gita Lestari",
-                "tanggal_pemesanan": "23-10-2020",
-                "tanggal_pekerjaan": "23-10-2023",
-                "total_biaya": 35000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Karpet",
-                "nama_pelanggan": "Hadi Pranoto",
-                "tanggal_pemesanan": "24-10-2020",
-                "tanggal_pekerjaan": "24-10-2023",
-                "total_biaya": 40000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Tirai",
-                "nama_pelanggan": "Indah Permata",
-                "tanggal_pemesanan": "25-10-2020",
-                "tanggal_pekerjaan": "25-10-2023",
-                "total_biaya": 45000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Bersih kamar mandi",
-                "nama_pelanggan": "Joko Susilo",
-                "tanggal_pemesanan": "26-10-2020",
-                "tanggal_pekerjaan": "26-10-2023",
-                "total_biaya": 50000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Daily Cleaning",
-                "nama_pelanggan": "Kiki Amalia",
-                "tanggal_pemesanan": "27-10-2020",
-                "tanggal_pekerjaan": "27-10-2023",
-                "total_biaya": 10000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Setrika",
-                "nama_pelanggan": "Lukman Hakim",
-                "tanggal_pemesanan": "28-10-2020",
-                "tanggal_pekerjaan": "28-10-2023",
-                "total_biaya": 12000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Kasur",
-                "nama_pelanggan": "Maya Sari",
-                "tanggal_pemesanan": "29-10-2020",
-                "tanggal_pekerjaan": "29-10-2023",
-                "total_biaya": 30000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Sofa",
-                "nama_pelanggan": "Nina Kartika",
-                "tanggal_pemesanan": "30-10-2020",
-                "tanggal_pekerjaan": "30-10-2023",
-                "total_biaya": 35000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
-            {
-                "subkategori": "Cuci Karpet",
-                "nama_pelanggan": "Omar Dani",
-                "tanggal_pemesanan": "31-10-2020",
-                "tanggal_pekerjaan": "31-10-2023",
-                "total_biaya": 40000,
-                "status_pesanan": "Mencari Pekerja Terdekat",
-            },
+        "kategori": [
+            {"id_kategori": id_kategori, "nama_kategori": nama_kategori}
+            for id_kategori, nama_kategori in set(
+                (res["id_kategori"], res["nama_kategori"]) for res in category_results
+            )
         ],
+        "subkategori": category_results,
+        "pesanan": order_results,
     }
+
     return render(request, "pekerjaan_jasa.html", context)
 
 
