@@ -9,26 +9,37 @@
             </div>
             <!-- Filter Section -->
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-                <div class="flex flex-wrap gap-4 items-center">
+                <form method="get" class="flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[16rem]">
-                        <select class="select-kategori w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                        <select name="kategori"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                             <option value="">Pilih Kategori</option>
-                            {% for kt in kategori %}<option value="{{ kt.id_kategori }}">{{ kt.nama_kategori }}</option>{% endfor %}
-                        </select>
-                    </div>
-                    <div class="flex-1 min-w-[16rem]">
-                        <select class="select-subkategori w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
-                            <option value="">Pilih Subkategori</option>
-                            {% for skt in subkategori %}
-                                <option value="{{ skt.id_subkategori }}"
-                                        data-kategori="{{ skt.id_kategori }}">{{ skt.nama_subkategori }}</option>
+                            {% for kt in kategori %}
+                                <option value="{{ kt.id_kategori }}"
+                                        {% if request.GET.kategori == kt.id_kategori|stringformat:"s" %}selected{% endif %}>
+                                    {{ kt.nama_kategori }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
-                    <button class="filter-button bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium flex-shrink-0">
+                    <div class="flex-1 min-w-[16rem]">
+                        <select name="subkategori"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                            <option value="">Pilih Subkategori</option>
+                            {% for skt in subkategori %}
+                                <option value="{{ skt.id_subkategori }}"
+                                        data-kategori="{{ skt.id_kategori }}"
+                                        {% if request.GET.subkategori == skt.id_subkategori|stringformat:"s" %}selected{% endif %}>
+                                    {{ skt.nama_subkategori }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit"
+                            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium flex-shrink-0">
                         Cari
                     </button>
-                </div>
+                </form>
             </div>
             <!-- Service Orders List -->
             <div class="space-y-6">

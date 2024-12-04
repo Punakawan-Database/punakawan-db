@@ -104,11 +104,11 @@ def pekerjaan_jasa(request):
     orders_conditions = []
 
     if category_filter:
-        orders_conditions.append("kj.namakategori = %s")
+        orders_conditions.append("kj.id = %s")
         orders_params.append(category_filter)
 
     if subcategory_filter:
-        orders_conditions.append("skj.namasubkategori = %s")
+        orders_conditions.append("skj.id = %s")
         orders_params.append(subcategory_filter)
 
     if orders_conditions:
