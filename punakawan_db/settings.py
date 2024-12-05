@@ -99,6 +99,7 @@ DATABASES = {
         "PORT": getenv("PGPORT", 5432),
         "OPTIONS": {
             "sslmode": "require",
+            "options": "-c search_path=basdat",
         },
         "DISABLE_SERVER_SIDE_CURSORS": True,
     }

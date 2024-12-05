@@ -11,6 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.db import connection
 
 def register(request):
     return render(request, 'register.html')
@@ -21,22 +24,44 @@ def register_user(request):
 def register_worker(request):
     return render(request, 'register_worker.html')
 
-def login_user(request):
+def login_view(request):
     if request.method == 'POST':
-        no_hp = request.POST.get('no_hp')
-        password = request.POST.get('password')
+        no_hp = request.POST['no_hp']
+        password = request.POST['password']
 
-        # Dummy authentication for testing purposes
-        if (no_hp == '2' and password == 'pengguna'):
-            return render(request, 'main_pengguna.html')  # Render the pengguna template
+        # Query to verify user in the `pengguna` table and get their ID
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT id, nohp FROM pengguna 
+                WHERE nohp = %s AND pwd = %s
+            """, [no_hp, password])
+            user_result = cursor.fetchone()
 
-        elif (no_hp == '1' and password == 'pekerja'):
-            return render(request, 'main_pekerja.html')  # Render the pekerja template
+        if user_result:
+            user_id, user_nohp = user_result
 
-        # If authentication failed for both
-        else:
-            messages.error(request, "Invalid No. HP or Password. Please try again.")
-    
+            # Determine user role by checking if ID exists in pelanggan or pekerja
+            with connection.cursor() as cursor:
+                # Check if user is a 'pelanggan'
+                cursor.execute("SELECT EXISTS (SELECT 1 FROM pelanggan WHERE id = %s)", [user_id])
+                is_pelanggan = cursor.fetchone()[0]
+
+                if is_pelanggan:
+                    # Render template for pelanggan
+                    return render(request, 'main_pelanggan.html')
+
+                # Check if user is a 'pekerja'
+                cursor.execute("SELECT EXISTS (SELECT 1 FROM pekerja WHERE id = %s)", [user_id])
+                is_pekerja = cursor.fetchone()[0]
+
+                if is_pekerja:
+                    # Render template for pekerja
+                    return render(request, 'main_pekerja.html')
+
+        # If login fails
+        messages.error(request, 'Invalid credentials.')
+        return redirect('login')
+
     return render(request, 'login.html')
 
 @login_required
@@ -153,9 +178,9 @@ def customer_blog(request):
 def admin_dashboard(request):
     return render(request, 'main_admin.html')
 
-def profile_pengguna(request):
+def profile_pelanggan(request):
     user = request.user
-    return render(request, 'profile_pengguna.html', {'user': user})
+    return render(request, 'profile_pelanggan.html', {'user': user})
 
 def profile_pekerja(request):
     user = request.user
