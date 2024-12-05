@@ -47,22 +47,27 @@ def login_view(request):
                 is_pelanggan = cursor.fetchone()[0]
 
                 if is_pelanggan:
-                    # Render template for pelanggan
-                    return render(request, 'main_pelanggan.html')
+                    request.session['user_role'] = 'pelanggan'  # Save role to session
+                    response = render(request, 'main_pelanggan.html')
+                    response.set_cookie('user_id', user_id)  # Set user ID cookie
+                    return response
 
                 # Check if user is a 'pekerja'
                 cursor.execute("SELECT EXISTS (SELECT 1 FROM pekerja WHERE id = %s)", [user_id])
                 is_pekerja = cursor.fetchone()[0]
 
                 if is_pekerja:
-                    # Render template for pekerja
-                    return render(request, 'main_pekerja.html')
+                    request.session['user_role'] = 'pekerja'  # Save role to session
+                    response = render(request, 'main_pekerja.html')
+                    response.set_cookie('user_id', user_id)  # Set user ID cookie
+                    return response
 
         # If login fails
         messages.error(request, 'Invalid credentials.')
         return redirect('login')
 
     return render(request, 'login.html')
+
 
 @login_required
 @csrf_exempt
@@ -179,23 +184,137 @@ def admin_dashboard(request):
     return render(request, 'main_admin.html')
 
 def profile_pelanggan(request):
-    user = request.user
-    return render(request, 'profile_pelanggan.html', {'user': user})
+    # Get the user ID from the cookie
+    user_id = request.COOKIES.get('user_id')
+
+    if not user_id:
+        messages.error(request, "You need to log in to view your profile.")
+        return redirect('login')
+
+    try:
+        # Fetch user details from the `pengguna` table
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT nama, jeniskelamin, nohp, tgllahir, alamat, saldomypay 
+                FROM pengguna 
+                WHERE id = %s
+            """, [user_id])
+            user_data = cursor.fetchone()
+
+        if not user_data:
+            messages.error(request, "User not found.")
+            return redirect('login')
+
+        # Unpack user details
+        nama, jeniskelamin, nohp, tgllahir, alamat, saldomypay = user_data
+
+        # Fetch user level from the `pelanggan` table
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT level 
+                FROM pelanggan 
+                WHERE id = %s
+            """, [user_id])
+            level_data = cursor.fetchone()
+
+        level = level_data[0] if level_data else "Unknown"
+
+        # Prepare context for the template
+        context = {
+            'nama': nama,
+            'jeniskelamin': "Laki-laki" if jeniskelamin.lower() == 'l' else "Perempuan",
+            'nohp': nohp,
+            'tgllahir': tgllahir,
+            'alamat': alamat,
+            'level': level,
+            'saldo': saldomypay  # Replace with actual balance retrieval logic if needed
+        }
+
+        return render(request, 'profile_pelanggan.html', context)
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {e}")
+        return redirect('login')
+
 
 def profile_pekerja(request):
-    user = request.user
-    return render(request, 'profile_pekerja.html', {'user': user})
+    # Get the user ID from the cookie
+    user_id = request.COOKIES.get('user_id')
 
-def update_pengguna(request):
+    if not user_id:
+        messages.error(request, "You need to log in to view your profile.")
+        return redirect('login')
+
+    try:
+        # Fetch user details from the `pengguna` table
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT nama, jeniskelamin, nohp, tgllahir, alamat, saldomypay 
+                FROM pengguna 
+                WHERE id = %s
+            """, [user_id])
+            user_data = cursor.fetchone()
+
+        if not user_data:
+            messages.error(request, "User not found.")
+            return redirect('login')
+
+        # Unpack user details
+        nama, jeniskelamin, nohp, tgllahir, alamat, saldomypay = user_data
+
+        # Fetch additional details from the `pekerja` table
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT namabank, nomorrekening, npwp, linkfoto, rating, jmlpesananselesai
+                FROM pekerja
+                WHERE id = %s
+            """, [user_id])
+            pekerja_data = cursor.fetchone()
+
+        if pekerja_data:
+            namabank, nomorrekening, npwp, linkfoto, rating, jmlpesananselesai = pekerja_data
+        else:
+            namabank = nomorrekening = npwp = linkfoto = rating = jmlpesananselesai = None
+
+        # Prepare context for the template
+        context = {
+            'nama': nama,
+            'jeniskelamin': "Laki-laki" if jeniskelamin.lower() == 'l' else "Perempuan",
+            'nohp': nohp,
+            'tgllahir': tgllahir,
+            'alamat': alamat,
+            'saldo': saldomypay,
+            'namabank': namabank,
+            'nomorrekening': nomorrekening,
+            'npwp': npwp,
+            'linkfoto': linkfoto,
+            'rating': rating,
+            'jmlpesananselesai': jmlpesananselesai,
+        }
+
+        return render(request, 'profile_pekerja.html', context)
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {e}")
+        return redirect('login')
+
+
+def update_pelanggan(request):
     user = request.user
-    return render(request, 'update_pengguna.html')
+    return render(request, 'update_pelanggan.html')
 
 def update_pekerja(request):
     user = request.user
     return render(request, 'update_pekerja.html')
 
-def logout_user(request):
-    logout(request)
-    response = redirect('main:show_main')
-    response.delete_cookie('last_login')
+def logout_view(request):
+    # Create a response to redirect the user to the login page
+    response = redirect('login')
+    
+    # Delete the `user_id` cookie
+    response.delete_cookie('user_id')
+    
+    # Optionally, display a logout message
+    messages.success(request, 'You have been logged out successfully.')
+    
     return response
