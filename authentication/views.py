@@ -59,9 +59,55 @@ def register_pelanggan(request):
 
     return render(request, 'register_pelanggan.html')
 
-
 def register_pekerja(request):
+    if request.method == "POST":
+        try:
+            # Get form data
+            nama = request.POST.get('name')
+            password = request.POST.get('password')
+            jeniskelamin = request.POST.get('gender')
+            nohp = request.POST.get('phone')
+            tgllahir = parse_date(request.POST.get('dob'))  # Parse date input
+            alamat = request.POST.get('address')
+            namabank = request.POST.get('bank')
+            nomorrekening = request.POST.get('account')
+            npwp = request.POST.get('npwp')
+            linkfoto = request.POST.get('photo')
+
+            # Validate inputs
+            if not (nama and password and jeniskelamin and nohp and tgllahir and alamat and namabank and nomorrekening):
+                messages.error(request, "All fields marked with * are required.")
+                return redirect('register_pekerja')
+
+            # Generate a new UUID for the user
+            user_id = str(uuid.uuid4())
+
+            # Insert into `pengguna` table
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO pengguna (id, nama, jeniskelamin, nohp, pwd, tgllahir, alamat, saldomypay)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, [user_id, nama, jeniskelamin, nohp, password, tgllahir, alamat, 0])
+
+            # Insert into `pekerja` table
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO pekerja (id, namabank, nomorrekening, npwp, linkfoto, rating, jmlpesananselesai)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, [user_id, namabank, nomorrekening, npwp, linkfoto, 0.0, 0])  # Default rating: 0.0, orders: 0
+
+            # Success message and redirect to login
+            messages.success(request, "Registration successful! Please log in.")
+            return redirect('login')  # Replace 'login' with your login URL name
+
+        except Exception as e:
+            # Error handling
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('register_pekerja')  # Redirect back to the form
+
+    # Render the registration form
     return render(request, 'register_pekerja.html')
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -337,14 +383,150 @@ def profile_pekerja(request):
         messages.error(request, f"An error occurred: {e}")
         return redirect('login')
 
-
 def update_pelanggan(request):
-    user = request.user
-    return render(request, 'update_pelanggan.html')
+    user_id = request.COOKIES.get('user_id')  # Assuming user_id is stored in cookies
+
+    if not user_id:
+        messages.error(request, "You need to log in to update your profile.")
+        return redirect('login')
+
+    if request.method == 'POST':
+        # Get form data
+        full_name = request.POST.get('full_name')
+        gender = request.POST.get('gender')
+        phone_number = request.POST.get('phone_number')
+        date_of_birth = request.POST.get('date_of_birth')
+        address = request.POST.get('address')
+
+        try:
+            # Update `pengguna` table
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE pengguna
+                    SET nama = %s, jeniskelamin = %s, nohp = %s, tgllahir = %s, alamat = %s
+                    WHERE id = %s
+                """, [full_name, gender, phone_number, date_of_birth, address, user_id])
+
+            messages.success(request, "Profile updated successfully.")
+            return redirect('profile_pelanggan')
+
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('update_pelanggan')
+
+    else:
+        try:
+            # Retrieve user data from `pengguna` and `pelanggan`
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT p.nama, p.jeniskelamin, p.nohp, p.tgllahir, p.alamat, p.saldomypay, pl.level
+                    FROM pengguna p
+                    JOIN pelanggan pl ON p.id = pl.id
+                    WHERE p.id = %s
+                """, [user_id])
+                user_data = cursor.fetchone()
+
+            if user_data:
+                context = {
+                    'user': {
+                        'full_name': user_data[0],
+                        'gender': user_data[1],
+                        'phone_number': user_data[2],
+                        'date_of_birth': user_data[3],
+                        'address': user_data[4],
+                        'mypay_balance': user_data[5],
+                        'level': user_data[6],
+                    }
+                }
+                return render(request, 'update_pelanggan.html', context)
+            else:
+                messages.error(request, "User not found.")
+                return redirect('login')
+
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('login')
+
 
 def update_pekerja(request):
-    user = request.user
-    return render(request, 'update_pekerja.html')
+    user_id = request.COOKIES.get('user_id')  # Asumsi user_id disimpan di cookies
+
+    if not user_id:
+        messages.error(request, "You need to log in to update your profile.")
+        return redirect('login')
+
+    if request.method == 'POST':
+        # Ambil data dari form
+        nama = request.POST.get('nama')
+        gender = request.POST.get('gender')
+        no_hp = request.POST.get('no_hp')
+        tanggal_lahir = request.POST.get('tanggal_lahir')
+        alamat = request.POST.get('alamat')
+        nama_bank = request.POST.get('nama_bank')
+        no_rekening = request.POST.get('no_rekening')
+        npwp = request.POST.get('npwp')
+        url_foto = request.POST.get('url_foto')
+
+        try:
+            # Update tabel `pengguna`
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE pengguna
+                    SET nama = %s, jeniskelamin = %s, nohp = %s, tgllahir = %s, alamat = %s
+                    WHERE id = %s
+                """, [nama, gender, no_hp, tanggal_lahir, alamat, user_id])
+
+            # Update tabel `pekerja`
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE pekerja
+                    SET namabank = %s, nomorrekening = %s, npwp = %s, linkfoto = %s
+                    WHERE id = %s
+                """, [nama_bank, no_rekening, npwp, url_foto, user_id])
+
+            messages.success(request, "Profile updated successfully.")
+            return redirect('profile_pekerja')
+
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('update_pekerja')
+
+    else:
+        try:
+            # Ambil data pekerja dari `pengguna` dan `pekerja`
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT p.nama, p.jeniskelamin, p.nohp, p.tgllahir, p.alamat,
+                           pk.namabank, pk.nomorrekening, pk.npwp, pk.linkfoto
+                    FROM pengguna p
+                    JOIN pekerja pk ON p.id = pk.id
+                    WHERE p.id = %s
+                """, [user_id])
+                pekerja_data = cursor.fetchone()
+
+            if pekerja_data:
+                context = {
+                    'pekerja': {
+                        'nama': pekerja_data[0],
+                        'gender': pekerja_data[1],
+                        'no_hp': pekerja_data[2],
+                        'tanggal_lahir': pekerja_data[3],
+                        'alamat': pekerja_data[4],
+                        'nama_bank': pekerja_data[5],
+                        'no_rekening': pekerja_data[6],
+                        'npwp': pekerja_data[7],
+                        'url_foto': pekerja_data[8],
+                    }
+                }
+                return render(request, 'update_pekerja.html', context)
+            else:
+                messages.error(request, "Worker not found.")
+                return redirect('login')
+
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('login')
+
 
 def logout_view(request):
     # Create a response to redirect the user to the login page
