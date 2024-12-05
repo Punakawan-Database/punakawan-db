@@ -17,8 +17,8 @@ urlpatterns = [
     path('delete-photo/', views.delete_photo, name='delete_photo'),
     path('change-password/', views.change_password, name='change_password'),
     path('delete_account/', views.delete_account, name='delete_account'),
-    path('register-user/', views.register_user, name='register_user'),
-    path('register-worker/', views.register_worker, name='register_worker'),
+    path('register-pelanggan/', views.register_pelanggan, name='register_pelanggan'),
+    path('register-pekerja/', views.register_pekerja, name='register_pekerja'),
     path('update-pengguna/', views.update_pelanggan, name='update_pelanggan'),
     path('update-pekerja/', views.update_pekerja, name='update_pekerja'),
 ]

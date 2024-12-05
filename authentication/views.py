@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from .forms import PenggunaRegistrationForm, PekerjaRegistrationForm, EditProfileForm
 from .decorators import role_required
 from django.urls import reverse
@@ -14,15 +15,53 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection
+from django.utils.dateparse import parse_date
 
 def register(request):
     return render(request, 'register.html')
   
-def register_user(request):
-    return render(request, 'register_user.html')
+def register_pelanggan(request):
+    if request.method == "POST":
+        try:
+            # Get data from the form
+            nama = request.POST.get('name')
+            password = request.POST.get('password')
+            jeniskelamin = request.POST.get('gender')
+            nohp = request.POST.get('phone')
+            tgllahir = parse_date(request.POST.get('dob'))  # Parse the date input
+            alamat = request.POST.get('address')
 
-def register_worker(request):
-    return render(request, 'register_worker.html')
+            # Generate a new UUID for the user
+            user_id = str(uuid.uuid4())
+
+            # Insert data into the `pengguna` table
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO pengguna (id, nama, jeniskelamin, nohp, pwd, tgllahir, alamat, saldomypay)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, [user_id, nama, jeniskelamin, nohp, password, tgllahir, alamat, 0])
+
+            # Insert data into the `pelanggan` table with default level `Bronze`
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO pelanggan (id, level)
+                    VALUES (%s, %s)
+                """, [user_id, "Bronze"])
+
+            # Success message and redirect
+            messages.success(request, "Registration successful! Please log in.")
+            return redirect('login')  # Replace with your login URL name
+
+        except Exception as e:
+            # Error handling
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('register_pelanggan')  # Reload the registration page
+
+    return render(request, 'register_pelanggan.html')
+
+
+def register_pekerja(request):
+    return render(request, 'register_pekerja.html')
 
 def login_view(request):
     if request.method == 'POST':
