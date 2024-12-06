@@ -1,75 +1,34 @@
 from django.shortcuts import render
 from django.urls import *
+from utils import db;
 
 # Create your views here.
 
-categories = [
-        {'name': 'Kategori 1', 'description': 'Ini Kategori 1', 'slug' : 'k1', 'subcategories': [
-            {'name': 'Subkategori 1', 'description' : 'Ini Deskripsi Subkategori 1', 'slug': 'sk1'},
-            {'name': 'Subkategori 2', 'description' : 'Ini Deskripsi Subkategori 2', 'slug': 'sk2'},
-        ]},
-        {'name': 'Kategori 2', 'description': 'Ini Kategori 2', 'slug' : 'k2', 'subcategories': [
-            {'name': 'Subkategori 1', 'description' : 'Ini Deskripsi Subkategori 1', 'slug': 'sk1'},
-            {'name': 'Subkategori 2', 'description' : 'Ini Deskripsi Subkategori 2', 'slug': 'sk2'},
-        ]},
-        {'name': 'Kategori 3', 'description': 'Ini Kategori 3', 'slug' : 'k3', 'subcategories': [
-            {'name': 'Subkategori 1', 'description' : 'Ini Deskripsi Subkategori 1', 'slug': 'sk1'},
-            {'name': 'Subkategori 2', 'description' : 'Ini Deskripsi Subkategori 2', 'slug': 'sk2'},
-        ]},
-    ]
+fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
+fetch_sub_categories = db.query_all("SELECT * FROM subkategori_jasa")
+pelanggan = db.query_all("SELECT * FROM PELANGGAN")
+pekerja = db.query_all("SELECT * FROM PEKERJA")
+pengguna = db.query_all("SELECT * from PENGGUNA")
 
-service_sessions = [
-        {
-            'id': 1,
-            'name': 'sesi servis 1 (2 hours)',
-            'price': '150000'
-        },
-        {
-            'id': 2,
-            'name': 'sesi servis 2 (4 hours)',
-            'price': '300000'
-        },
-        {
-            'id': 3,
-            'name': 'sesi servis 3 (6 hours)',
-            'price': '450000'
-        }
-    ]
+# print(fetch_categories[0]['id'])
+# print(fetch_sub_categories[0]['kategorijasaid'])
 
-workers = [
-        {
-            'id': 1,
-            'name': 'John Doe',
-            'profile_picture': None
-        },
-        {
-            'id': 2,
-            'name': 'Jane Smith',
-            'profile_picture': None
-        },
-        {
-            'id': 3,
-            'name': 'Bob Johnson',
-            'profile_picture': None
-        }
-    ]
+for j in fetch_categories:
+    j.update({'subcategories': []})
 
-testimonials = [
-        {
-            'user_name': 'Alice Cooper',
-            'date': '2024-03-10',
-            'text': 'Great service! Very thorough and professional.',
-            'rating': 5,
-            'worker_name': 'John Doe'
-        },
-        {
-            'user_name': 'David Brown',
-            'date': '2024-03-08',
-            'text': 'Good service but arrived a bit late.',
-            'rating': 4,
-            'worker_name': 'Jane Smith'
-        }
-    ]
+# print(fetch_categories)
+for j in fetch_categories:
+    for i in fetch_sub_categories:
+        if (i["kategorijasaid"] == j['id']):
+            j['subcategories'].append(i)
+            
+
+categories = fetch_categories
+
+
+
+testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
+# print(testimoni[0])
 
 def homepage(request):
     context = {
@@ -79,47 +38,186 @@ def homepage(request):
     
     return render(request, 'homepage.html', context)
 
+
 def subkategori_jasa(request, kategori_slug, subkategori_slug):
-    # Find the matching category
-    category = next((cat for cat in categories if cat['slug'] == kategori_slug), None)
-    if not category:
-        return render(request, '404.html', status=404)  # Return a 404 page if category not found
+    selected_category = []
+    for x in categories:
+        if str(x["id"]) == str(kategori_slug):
+            selected_category.append(x)
+            break
     
-    # Find the matching subcategory within the category
-    subcategory = next((sub for sub in category['subcategories'] if sub['slug'] == subkategori_slug), None)
-    if not subcategory:
-        return render(request, '404.html', status=404)  # Return a 404 page if subcategory not found
+    # print(selected_category)
+            
+    selected_subcategory = None
+    for x in selected_category[0]["subcategories"]:
+        if str(x["id"]) == str(subkategori_slug):
+            selected_subcategory = x
     
-    # Pass the category and subcategory names to the template
+    # print(selected_subcategory)
+    # print(type(selected_category[0]))
+    # print(temp)
+    # print(type(selected_subcategory['id']))
+    get_sesi_layanan = db.query_all("select * from sesi_layanan")
+    # print(type(get_sesi_layanan))
+    
+    service_sessions = []
+    for x in get_sesi_layanan:
+        if x["subkategoriid"] == selected_subcategory['id']:
+            service_sessions.append(x)
+    
+    # print(service_sessions)
+    # print(db.query_all(f"SELECT * FROM sesi_layanan where subkategoriid={str(selected_subcategory['id'])}"))
+    
+    pekerja = db.query_all(f"SELECT * FROM PEKERJA_KATEGORI_JASA")
+    # print("FF "+kategori_slug)
+    # print(type(pekerja[0]))
+    workers_data = []
+    for x in pekerja:
+    #     print(str(x['kategorijasaid']))
+        if str(x['kategorijasaid']) == kategori_slug:
+            workers_data.append(x)
+        #     # if kategori_slug = 
+    # print(workers)
+    
+    temp_worker = db.query_all("SELECT * FROM PEKERJA")
+    # print(temp_worker)
+    
+    workers = []
+    for x in temp_worker:
+        for i in workers_data:
+            if str(x['id']) == str(i['pekerjaid']):
+                workers.append(x)
+                
+    # print(workers)
+    
+    get_user = db.query_all("SELECT * FROM PENGGUNA, PEKERJA as pk where PENGGUNA.id = pk.id")
+    # print(len(get_user))
+    
+    # print((workers))
+    workers_lengkap = []
+    for x in get_user:
+        for j in workers:
+            if str(x['id']) == str(j['id']):
+                workers_lengkap.append(x)
+                # print(x['id'], j['id'], j['id']==x['id'])
+                
+        
+    # print(workers_lengkap)
+    
+    # print(selected_category)
+    
+    selected_testimoni = []
+    for x in testimoni:
+        if str(x['idkategorijasa']) == str(subkategori_slug):
+            selected_testimoni.append(x)
+    
+    # print(selected_testimoni)
+    for j in pengguna:
+        for x in selected_testimoni:
+            if (str(x['idpelanggan'])) == str(j['id']):
+                x['nama_pelanggan'] = str(j['nama'])
+                
+    for j in pengguna:
+        for x in selected_testimoni:
+            if (str(x['idpekerja'])) == str(j['id']):
+                x['worker_name'] = str(j['nama'])
+                
+                
+                
+    metode_bayar = db.query_all("select * from metode_bayar")
+    # print(metode_bayar)
+    
+    discID = db.query_all("select * from diskon")
     context = {
-        'selected_category': category,
-        'selected_subcategory': subcategory,
+        'selected_category': selected_category[0],
+        'selected_subcategory': selected_subcategory,
         'service_sessions': service_sessions,
-        'workers': workers,
-        'testimonials': testimonials
+        # 'pengguna_testi' : pengguna_testi,
+        'workers': workers_lengkap,
+        'testimonials' : selected_testimoni,
+        'metode_bayar' : metode_bayar,
+        'discount_be' : discID,
     }
     
-    return render(request, 'subkategori.html', context)
+    return render(request, "subkategori.html", context= context)
 
 
 def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
-    # Find the matching category
-    # category = next((cat for cat in categories if cat['slug'] == kategori_slug), None)
-    # if not category:
-    #     return render(request, '404.html', status=404)  # Return a 404 page if category not found
+    selected_category = []
+    for x in categories:
+        if str(x["id"]) == str(kategori_slug):
+            selected_category.append(x)
+            break
+        
+    selected_subcategory = None
+    for x in selected_category[0]["subcategories"]:
+        if str(x["id"]) == str(subkategori_slug):
+            selected_subcategory = x
     
-    # # Find the matching subcategory within the category
-    # subcategory = next((sub for sub in category['subcategories'] if sub['slug'] == subkategori_slug), None)
-    # if not subcategory:
-    #     return render(request, '404.html', status=404)  # Return a 404 page if subcategory not found
+    get_sesi_layanan = db.query_all("select * from sesi_layanan")
+    # print(type(get_sesi_layanan))
     
-    # Pass the category and subcategory names to the template
+    service_sessions = []
+    for x in get_sesi_layanan:
+        if x["subkategoriid"] == selected_subcategory['id']:
+            service_sessions.append(x)
+    
+    pekerja = db.query_all(f"SELECT * FROM PEKERJA_KATEGORI_JASA")
+    # print("FF "+kategori_slug)
+    # print(type(pekerja[0]))
+    workers_data = []
+    for x in pekerja:
+    #     print(str(x['kategorijasaid']))
+        if str(x['kategorijasaid']) == kategori_slug:
+            workers_data.append(x)
+        #     # if kategori_slug = 
+    # print(workers)
+    
+    temp_worker = db.query_all("SELECT * FROM PEKERJA")
+    # print(temp_worker)
+    
+    workers = []
+    for x in temp_worker:
+        for i in workers_data:
+            if str(x['id']) == str(i['pekerjaid']):
+                workers.append(x)
+                
+    # print(workers)
+    
+    get_user = db.query_all("SELECT * FROM PENGGUNA, PEKERJA as pk where PENGGUNA.id = pk.id")
+    # print(len(get_user))
+    
+    # print((workers))
+    workers_lengkap = []
+    for x in get_user:
+        for j in workers:
+            if str(x['id']) == str(j['id']):
+                workers_lengkap.append(x)
+    
+    
+    selected_testimoni = []
+    for x in testimoni:
+        if str(x['idkategorijasa']) == str(subkategori_slug):
+            selected_testimoni.append(x)
+    
+    # print(selected_testimoni)
+    for j in pengguna:
+        for x in selected_testimoni:
+            if (str(x['idpelanggan'])) == str(j['id']):
+                x['nama_pelanggan'] = str(j['nama'])
+                
+    for j in pengguna:
+        for x in selected_testimoni:
+            if (str(x['idpekerja'])) == str(j['id']):
+                x['worker_name'] = str(j['nama'])
+
+    # print(selected_testimoni)
     context = {
-        'selected_category': {'name': 'Kategori 4', 'description': 'Ini Kategori 4', 'slug' : 'k4'},
-        'selected_subcategory': {'name': 'Subkategori 1', 'description' : 'Ini Deskripsi Subkategori 1', 'slug': 'sk1'},
+        'selected_category': selected_category[0],
+        'selected_subcategory': selected_subcategory,
         'service_sessions': service_sessions,
-        'workers': workers,
-        'testimonials': testimonials
+        'workers': workers_lengkap,
+        'testimonials': selected_testimoni
     }
     
     return render(request, 'subkategori_pekerja.html', context)
@@ -127,18 +225,18 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
 orders = [
         {
             'id': 1,
-            'subcategory': {'name': 'House Cleaning'},
-            'service_session': {'name': 'Basic Cleaning (2 hours)'},
+            'subcategory': 'House Cleaning',
+            'service_session': 'Basic Cleaning (2 hours)',
             'total_payment': '150000',
-            'worker': {'name': 'John Doe'},
+            'worker': 'John Doe',
             'status': 'waiting_payment',
             'has_testimonial': False,
             'get_status_display': 'Menunggu Pembayaran'
         },
         {
             'id': 2,
-            'subcategory': {'name': 'House Cleaning'},
-            'service_session': {'name': 'Deep Cleaning (4 hours)'},
+            'subcategory': 'House Cleaning',
+            'service_session': 'Deep Cleaning (4 hours)',
             'total_payment': '300000',
             'worker': None,
             'status': 'finding_worker',
@@ -147,30 +245,47 @@ orders = [
         },
         {
             'id': 3,
-            'subcategory': {'name': 'House Cleaning'},
-            'service_session': {'name': 'Premium Cleaning (6 hours)'},
+            'subcategory': 'House Cleaning',
+            'service_session': 'Premium Cleaning (6 hours)',
             'total_payment': '450000',
-            'worker': {'name': 'Jane Smith'},
+            'worker': 'Jane Smith',
             'status': 'completed',
             'has_testimonial': False,
             'get_status_display': 'Pesanan Selesai'
         },
         {
             'id': 4,
-            'subcategory': {'name': 'House Cleaning'},
-            'service_session': {'name': 'Basic Cleaning (2 hours)'},
+            'subcategory': 'House Cleaning',
+            'service_session': 'Basic Cleaning (2 hours)',
             'total_payment': '150000',
-            'worker': {'name': 'Bob Johnson'},
+            'worker': 'Bob Johnson',
             'status': 'completed',
             'has_testimonial': True,
             'get_status_display': 'Pesanan Selesai'
         }
     ]
 
+order = db.query_all("select * from tr_pemesanan_status, tr_pemesanan_jasa, pekerja, pelanggan status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id and tr_pemesanan_jasa.idpelanggan=pelanggan.id and tr_pemesanan_jasa.idpekerja=pekerja.id")
+print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
+
 def view_pemesanan(request):
+    subcategories = []
+
+    for order in orders:
+        if order['subcategory'] not in subcategories:
+            subcategories.append(order['subcategory'])
+
+    statusses = []
+
+    for order in orders:
+        if order['get_status_display'] not in statusses:
+            statusses.append(order['get_status_display'])
+
     context = {
         'title' : 'Pemesanan',
         'orders': orders,
-    }
+        'subcategories': subcategories,
+        'statusses': statusses,
+        }
     
     return render(request, 'pemesanan_jasa.html', context)

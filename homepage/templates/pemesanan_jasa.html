@@ -1,68 +1,181 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>PunakawanDB</title>
-</head>
+{% extends 'base.html' %}
+{% load static %}
 
-<body>
-    <div>
-        <select name="Subategori" id="Subkategori">
-            <option selected disabled hidden>Select Subkategori</option>
-            <!-- {% for category in categories %}
-                <option value="{{ category.slug }}">{{ category.name }}</option>
-            {% endfor %} -->
-        </select>
-        
-        <select id="status_pesanan">
-            <option selected disabled hidden>Status Pesanan</option>
-        </select>
+{% block meta %}
+    <title>PunakawanDB</title>
+{% endblock meta %}
 
-        <button type="button" id="submit">Search</button>
+{% block content %}
+<div class="min-h-screen bg-blue-600 py-8 px-4 pt-16 bg-gradient-to-br from-blue-600 to-blue-800">
+    <div class="max-w-5xl mx-auto">
+        <!-- Filter Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Subkategori Dropdown -->
+                <div class="relative">
+                    <select name="Subkategori" id="Subkategori"
+                            class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg 
+                                   text-gray-700 appearance-none focus:outline-none 
+                                   focus:border-blue-500 transition duration-300 bg-white pr-8">
+                        <option selected disabled hidden>Select Subkategori</option>
+                        {% for subcategory in subcategories %}
+                            <option value="{{ subcategory }}">{{ subcategory }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Status Dropdown -->
+                <div class="relative">
+                    <select id="status_pesanan"
+                            class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg 
+                                   text-gray-700 appearance-none focus:outline-none 
+                                   focus:border-blue-500 transition duration-300 bg-white pr-8">
+                        <option selected disabled hidden>Status Pesanan</option>
+                        {% for status in statusses %}
+                            <option value="{{ status }}">{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Search Button -->
+                <button type="button" id="submit"
+                        class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 
+                               hover:bg-blue-700 transition duration-300 
+                               transform hover:scale-105 focus:outline-none 
+                               focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+                        onclick="searchOrders()">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="grid grid-cols-1 gap-6">
+            {% for order in orders %}
+            <div class="order bg-white rounded-2xl shadow-lg p-6" subcategory="{{ order.subcategory }}" status="{{ order.get_status_display }}">
+                <p class="mb-4">
+                    <strong>Subkategori:</strong> {{ order.subcategory }}<br>
+                    <strong>Service Session:</strong> {{ order.service_session }}<br>
+                    <strong>Total Payment:</strong> {{ order.total_payment }}<br>
+                    <strong>Worker:</strong> {{ order.worker }}<br>
+                    <strong>Status:</strong> {{ order.get_status_display }}
+                </p>
+
+                <!-- Action Buttons -->
+                {% if order.get_status_display == "Menunggu Pembayaran" or order.get_status_display == "Mencari Pekerja Terdekat" %}
+                    <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        Batalkan
+                    </button>
+                {% endif %}
+
+                {% if order.get_status_display == "Pesanan Selesai" %}
+                <button onclick="openTestimoniModal()"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    Buat Testimoni
+                </button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
     </div>
+</div>
 
-    <div>
-        {% for pemesanan_jasa in orders%}
-        {{ pemesanan_jasa.subcategory }} | {{ pemesanan_jasa.service_session }} | {{ pemesanan_jasa.total_payment }}
-        {{ pemesanan_jasa.worker }} | {{ pemesanan_jasa.get_status_display }}
-
-        {% if pemesanan_jasa.get_status_display == "Menunggu Pembayaran" %}
-        <button>Batalkan</button>
-        {% endif %}
-
-        {% if pemesanan_jasa.get_status_display == "Mencari Pekerja Terdekat" %}
-        <button>Batalkan</button>
-        {% endif %}
-
-        {% if pemesanan_jasa.get_status_display == "Pesanan Selesai" %}
-        <button onclick="testimoni()">Buat Testimoni</button>
-        {% endif %}
-
-        <br>
-        {% endfor %}
+<!-- Modal -->
+<div id="testimoni-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-3/4 md:w-1/2">
+        <h2 class="text-xl font-bold mb-4">Create Testimonial</h2>
+        <form id="testimoni-form">
+            <div class="mb-4">
+                <label for="rating-display" class="block text-gray-700 font-bold mb-2">Rating: <span id="rating-display">5</span></label>
+                <input type="range" id="rating" name="rating" min="1" max="10" class="w-full" oninput="document.getElementById('rating-display').innerText = this.value">
+            </div>
+            <div class="mb-4">
+                <label for="comment" class="block text-gray-700 font-bold mb-2">Comment</label>
+                <textarea id="comment" name="comment" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button type="button" onclick="closeTestimoniModal()"
+                        class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    Submit
+                </button>
+            </div>
+        </form>
     </div>
-
-    <div id="new-testimoni"></div>
-</body>
+</div>
 
 <script>
-    function testimoni() {
-        document.getElementById("new-testimoni").innerHTML = `
-            <div >
-                <h1>Create Testimonial</h1>
-                <div>
-                    <label for="rating">Rating</label>
-                    <input type="range" id="rating" name="rating" min="1" max="10">
-                </div>
-                <div class="mb-4">
-                    <label for="comment">Comment</label>
-                    <textarea id="comment" name="comment" rows="3"></textarea>
-                </div>
-                <button type="submit" onclick="closemodal()" >Submit</button>
-            </div>
-        `;
+    // Open Modal
+    function openTestimoniModal() {
+        document.getElementById('testimoni-modal').classList.remove('hidden');
     }
 
-    function closemodal() {
-        document.getElementById("new-testimoni").innerHTML = "";
+    // Close Modal
+    function closeTestimoniModal() {
+        document.getElementById('testimoni-modal').classList.add('hidden');
+    }
+
+    // Submit Testimonial with AJAX
+    document.getElementById('testimoni-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const rating = document.getElementById('rating').value;
+        const comment = document.getElementById('comment').value;
+
+
+        fetch('/submit-testimoni/', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+            rating: rating,
+            comment: comment
+            })
+        }).then(response => {
+            if (response.ok) {
+            alert('Testimonial submitted successfully!');
+            closeTestimoniModal();
+            } else {
+            alert('Failed to submit testimonial. Please try again.');
+            }
+        }).catch(error => {
+            alert('Failed to submit testimonial. Please try again.');
+            console.error(error);
+        });
+
+        closeTestimoniModal();
+    });
+
+    function searchOrders() {
+        // Get selected filter values
+        const selectedSubcategory = document.getElementById("Subkategori").value;
+        const selectedStatus = document.getElementById("status_pesanan").value;
+
+        // Select all order elements
+        const orders = document.querySelectorAll('.order');
+
+
+        // Loop through each order to determine visibility
+        orders.forEach(order => {
+            const orderSubcategory = order.getAttribute("subcategory");
+            const orderStatus = order.getAttribute("status");
+
+            // Determine if the order matches filters
+            const matchesSubcategory = !selectedSubcategory || orderSubcategory === selectedSubcategory;
+            const matchesStatus = !selectedStatus || orderStatus === selectedStatus;
+
+            // Show or hide order based on filters
+            if (matchesSubcategory && matchesStatus) {
+                order.style.display = "block"; // Show matching order
+            } else {
+                order.style.display = "none"; // Hide non-matching order
+            }
+        });
     }
 </script>
+{% endblock content %}

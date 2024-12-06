@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "Diskon",
     "transaksi",
     "pekerjaan_jasa",
+    "utils",
 ]
 
 MIDDLEWARE = [

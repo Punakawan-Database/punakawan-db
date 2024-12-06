@@ -1,82 +1,163 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>PunakawanDB</title>
-</head>
+{% extends 'base.html' %}
+{% load static %}
+{% block meta %}
+    <title>PunakawanDB</title>
+{% endblock meta %}
 
-<body>
-    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
-    {{ title }}
-    </div>
+{% block content %}
+{% include 'navbar.html' %}
+<div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 py-8 px-4 pt-16">
+    <div class="max-w-5xl mx-auto">
+        <!-- Animated Header -->
+        <div class="text-center mb-10 animate-fade-in-down">
+            <h2 class="text-5xl font-extrabold text-white mb-4 tracking-tight drop-shadow-lg">
+                {{ title }}
+            </h2>
+        </div>
 
-    <div style="display: flex; flex-direction: col;">
-        <select name="Kategori" id="Kategori">
-            <option selected disabled hidden>Select Kategori</option>
-            {% for category in categories %}
-                <option value="{{ category.slug }}">{{ category.name }}</option>
-            {% endfor %}
-        </select>
+        <!-- Enhanced Filter Section -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-10 transform transition-all hover:scale-[1.02]">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Styled Dropdown -->
+                <div class="relative">
+                    <select id="Kategori" name="Kategori" 
+                            class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg 
+                                    text-gray-700 appearance-none focus:outline-none 
+                                    focus:border-blue-500 transition duration-300 
+                                    bg-white pr-8 hover:border-blue-400">
+                        <option selected disabled hidden>Select Kategori</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.namakategori }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
+                    </div>
+                </div>
 
-        <input type="text" id="search_subkategori" name="search_subkategori" placeholder="Nama Subkategori">
+                <!-- Search Input with Icon -->
+                <div class="relative">
+                    <input id="search_subkategori" name="search_subkategori" type="text" 
+                            placeholder="Nama Subkategori" 
+                            class="w-full px-4 py-3 pl-10 border-2 border-blue-200 rounded-lg 
+                                text-gray-700 focus:outline-none focus:border-blue-500 
+                                transition duration-300 hover:border-blue-400">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
 
-        <button type="button" id="submit">Search</button>
-    </div>
-
-    <br>
-    <div id="category-list">
-        {% for category in categories %}
-            <div class="category" data-category-slug="{{ category.slug }}">
-                <label> {{ category.name }} </label>
-                <ol>
-                    {% for item in category.subcategories %}
-                        <li class="subcategory" data-subcategory-name="{{ item.name }}">
-                            <a href="{% url 'subkategori_jasa' kategori_slug=category.slug subkategori_slug=item.slug %}">
-                                {{ item.name }}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ol>
+                <!-- Search Button with Hover Effect -->
+                <button id="submit" type="button" 
+                        class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 
+                            hover:bg-blue-700 transition duration-300 
+                            transform hover:scale-105 focus:outline-none 
+                            focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                    Search
+                </button>
             </div>
-        {% endfor %}
-        <label> Kategori 4</label>
-            <ol>
-                <li class="subcategory_pekerja">
-                    <a href="{% url 'subkategori_jasa_pekerja' kategori_slug='k4' subkategori_slug='sk1' %}">
-                        Subkategori 1
-                    </a>
-                </li>
-            </ol>
+        </div>
+
+        <!-- Categories Section with Card-like Design -->
+        <div class="grid md:grid-cols-2 gap-8">
+            {% for category in categories %}
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden 
+                            transform transition-all hover:scale-[1.03] hover:shadow-2xl category"
+                    data-category-slug="{{ category.id }}">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">
+                            {{ category.namakategori }}
+                        </h3>
+                        <ol class="space-y-2">
+                            {% for item in category.subcategories %}
+                                <li class="subcategory group"
+                                    data-subcategory-name="{{ item.name }}">
+                                    <a href="{% url 'subkategori_jasa' kategori_slug=category.id subkategori_slug=item.id %}" 
+                                    class="text-blue-600 hover:text-blue-800 
+                                            transition duration-300 flex items-center 
+                                            group-hover:translate-x-2">
+                                        <svg class="h-4 w-4 mr-2 text-blue-400 
+                                                group-hover:text-blue-600 transition" 
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                        {{ item.namasubkategori }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
+</div>
 
-    <script>
-        document.getElementById("submit").addEventListener("click", function () {
-            const selectedCategory = document.getElementById("Kategori").value;
-            const searchInput = document.getElementById("search_subkategori").value.toLowerCase();
-            const categories = document.querySelectorAll(".category");
+<script>
+    document.getElementById("submit").addEventListener("click", function () {
+        const selectedCategory = document.getElementById("Kategori").value;
+        const searchInput = document.getElementById("search_subkategori").value.toLowerCase();
+        const categories = document.querySelectorAll(".category");
 
-            categories.forEach(category => {
-                const categorySlug = category.getAttribute("data-category-slug");
-                const subcategories = category.querySelectorAll(".subcategory");
-                let categoryVisible = false;
+        categories.forEach(category => {
+            const categorySlug = category.getAttribute("data-category-slug");
+            const subcategories = category.querySelectorAll(".subcategory");
+            let categoryVisible = false;
 
-                if (!selectedCategory || categorySlug === selectedCategory) {
-                    subcategories.forEach(subcategory => {
-                        const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
-                        if (!searchInput || subcategoryName.includes(searchInput)) {
-                            subcategory.style.display = "list-item";
-                            categoryVisible = true;
-                        } else {
-                            subcategory.style.display = "none";
-                        }
-                    });
+            if (!selectedCategory || categorySlug === selectedCategory) {
+                subcategories.forEach(subcategory => {
+                    const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
+                    if (!searchInput || subcategoryName.includes(searchInput)) {
+                        subcategory.style.display = "list-item";
+                        categoryVisible = true;
+                    } else {
+                        subcategory.style.display = "none";
+                    }
+                });
 
-                    category.style.display = categoryVisible ? "block" : "none";
-                } else {
-                    category.style.display = "none";
-                }
-            });
+                category.style.display = categoryVisible ? "block" : "none";
+            } else {
+                category.style.display = "none";
+            }
         });
-    </script>
-</body>
+    });
+</script>
 
-</html>
+{% endblock content %}
+
+{% block extra_css %}
+<style>
+    @keyframes fade-in-down {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-down {
+        animation: fade-in-down 0.8s ease-out;
+    }
+    .bg-gradient-to-br {
+        background: linear-gradient(to bottom right, #1e3a8a, #2563eb);
+    }
+    .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .hover\:scale-105:hover {
+        transform: scale(1.05);
+    }
+    .hover\:shadow-2xl:hover {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .hover\:translate-x-2:hover {
+        transform: translateX(0.5rem);
+    }
+</style>
+{% endblock extra_css %}
