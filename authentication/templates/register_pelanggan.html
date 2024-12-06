@@ -10,7 +10,7 @@
 
 <div class="relative h-screen flex justify-center items-center bg-blue-500 p-5">
     <div class="mt-5 relative bg-white p-8 rounded-2xl shadow-2xl transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl max-w-md w-full h-[82vh] overflow-y-auto">
-        <h1 class="text-blue-600 text-center mb-6 text-2xl font-bold">Registrasi Pengguna</h1>
+        <h1 class="text-blue-600 text-center mb-6 text-2xl font-bold">Registrasi Pelanggan</h1>
         <form method="post" class="flex flex-col gap-6">
             {% csrf_token %}
             <div class="flex flex-col">
@@ -26,16 +26,16 @@
                 <div class="flex gap-4">
                     <label class="flex items-center gap-2">
                         <input type="radio" name="gender" value="L" class="focus:ring-blue-400">
-                        L
+                        Laki-Laki
                     </label>
                     <label class="flex items-center gap-2">
                         <input type="radio" name="gender" value="P" class="focus:ring-blue-400">
-                        P
+                        Perempuan
                     </label>
                 </div>
             </div>
             <div class="flex flex-col">
-                <label for="phone" class="text-blue-600 font-semibold mb-2">NoHP:</label>
+                <label for="phone" class="text-blue-600 font-semibold mb-2">No. HP:</label>
                 <input type="text" id="phone" name="phone" class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
             <div class="flex flex-col">

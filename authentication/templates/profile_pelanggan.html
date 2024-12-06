@@ -6,7 +6,7 @@
 {% endblock meta %}
 
 {% block content %}
-{% include 'navbar_pengguna.html' %}
+{% include 'navbar_pelanggan.html' %}
 
 <div class="min-h-screen bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center py-8 px-4">
   <div class="bg-white/95 shadow-2xl rounded-2xl p-6 w-full max-w-2xl transform hover:scale-[1.02] transition-all duration-300">
@@ -18,49 +18,49 @@
       </div>
       <div>
         <h2 class="text-2xl font-bold text-gray-800">User Profile</h2>
-        <p class="text-sm text-gray-500">Manage your personal information</p>
+        <p class="text-sm text-gray-500">Pelanggan</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-        <span class="block text-gray-500 text-xs font-medium mb-1">Full Name</span>
-        <p class="text-gray-800 font-semibold text-sm">John Doe</p>
+        <span class="block text-gray-500 text-xs font-medium mb-1">Nama</span>
+        <p class="text-gray-800 font-semibold text-sm">{{ nama }}</p>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
         <span class="block text-gray-500 text-xs font-medium mb-1">Level</span>
-        <p class="text-gray-800 font-semibold text-sm">Premium Member</p>
+        <p class="text-gray-800 font-semibold text-sm">{{ level }}</p>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-        <span class="block text-gray-500 text-xs font-medium mb-1">Gender</span>
-        <p class="text-gray-800 font-semibold text-sm">Male</p>
+        <span class="block text-gray-500 text-xs font-medium mb-1">Jenis Kelamin</span>
+        <p class="text-gray-800 font-semibold text-sm">{{ jeniskelamin }}</p>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-        <span class="block text-gray-500 text-xs font-medium mb-1">Phone Number</span>
-        <p class="text-gray-800 font-semibold text-sm">+62 812 3456 7890</p>
+        <span class="block text-gray-500 text-xs font-medium mb-1">No. HP</span>
+        <p class="text-gray-800 font-semibold text-sm">{{ nohp }}</p>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-        <span class="block text-gray-500 text-xs font-medium mb-1">Date of Birth</span>
-        <p class="text-gray-800 font-semibold text-sm">January 15, 1990</p>
+        <span class="block text-gray-500 text-xs font-medium mb-1">Tanggal Lahir</span>
+        <p class="text-gray-800 font-semibold text-sm">{{ tgllahir }}</p>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-        <span class="block text-gray-500 text-xs font-medium mb-1">Address</span>
-        <p class="text-gray-800 font-semibold text-sm">123 Main Street, Jakarta</p>
+        <span class="block text-gray-500 text-xs font-medium mb-1">Alamat</span>
+        <p class="text-gray-800 font-semibold text-sm">{{ alamat }}</p>
       </div>
 
       <div class="md:col-span-2 group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
         <span class="block text-gray-500 text-xs font-medium mb-1">MyPay Balance</span>
-        <p class="text-gray-800 font-semibold">Rp 1,500,000.00</p>
+        <p class="text-gray-800 font-semibold">{{ saldo }}</p>
       </div>
     </div>
 
     <div class="mt-6 flex justify-end">
-      <button onclick="window.location.href='{% url 'update_pengguna' %}'" 
+      <button onclick="window.location.href='{% url 'update_pelanggan' %}'" 
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg
                shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200
                flex items-center space-x-2 text-sm">
