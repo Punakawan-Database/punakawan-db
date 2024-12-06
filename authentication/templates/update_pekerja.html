@@ -9,7 +9,7 @@
 {% include 'navbar_pekerja.html' %}
 
 <div class="min-h-screen bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center py-8 px-4">
-  <div class="mt-10 bg-white/95 shadow-2xl rounded-2xl p-6 w-full max-w-2xl transform hover:scale-[1.02] transition-all duration-300">
+  <div class="mt-10 bg-white/95 shadow-2xl rounded-2xl p-6 w-full max-w-4xl transform hover:scale-[1.02] transition-all duration-300">
     <div class="flex items-center space-x-4 mb-6">
       <div>
         <h2 class="text-2xl font-bold text-gray-800">Update profile</h2>
@@ -20,107 +20,113 @@
     <form method="POST" class="space-y-4">
       {% csrf_token %}
       
-      <div class="space-y-3">
-        <!-- Nama -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">Nama :</label>
-          <input type="text" name="nama" id="nama" 
-                 value="{{ pekerja.nama }}" 
-                 placeholder="Masukkan nama"
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
-        </div>
+      <div class="grid grid-cols-2 gap-6">
+        <!-- First Column -->
+        <div class="space-y-4">
+          <!-- Nama -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">Nama</label>
+            <input type="text" name="nama" id="nama" 
+                   value="{{ pekerja.nama }}" 
+                   placeholder="Masukkan nama"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
+          </div>
 
-        <!-- Jenis Kelamin -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">Jenis Kelamin :</label>
-          <div class="flex space-x-4">
-            <label class="inline-flex items-center">
-              <input type="radio" name="gender" value="L" 
-                     {% if pekerja.gender == "L" %}checked{% endif %} 
-                     class="form-radio">
-              <span class="ml-2">Laki-Laki</span>
-            </label>
-            <label class="inline-flex items-center">
-              <input type="radio" name="gender" value="P" 
-                     {% if pekerja.gender == "P" %}checked{% endif %} 
-                     class="form-radio">
-              <span class="ml-2">Perempuan</span>
-            </label>
+          <!-- Jenis Kelamin -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">Jenis Kelamin</label>
+            <div class="flex space-x-4">
+              <label class="inline-flex items-center">
+                <input type="radio" name="gender" value="L" 
+                       {% if pekerja.gender == "L" %}checked{% endif %} 
+                       class="form-radio">
+                <span class="ml-2">Laki-Laki</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="radio" name="gender" value="P" 
+                       {% if pekerja.gender == "P" %}checked{% endif %} 
+                       class="form-radio">
+                <span class="ml-2">Perempuan</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- No HP -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">No HP</label>
+            <input type="tel" name="no_hp" id="no_hp" 
+                   value="{{ pekerja.no_hp }}" 
+                   placeholder="Masukkan nomor HP"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
+          </div>
+
+          <!-- Tanggal Lahir -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">Tanggal Lahir</label>
+            <input type="date" name="tanggal_lahir" id="tanggal_lahir" 
+                   value="{{ pekerja.tanggal_lahir|date:'Y-m-d' }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
+          </div>
+
+          <!-- Alamat -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">Alamat</label>
+            <input type="text" name="alamat" id="alamat" 
+                   value="{{ pekerja.alamat }}" 
+                   placeholder="Masukkan alamat"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
           </div>
         </div>
 
-        <!-- No HP -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">No HP :</label>
-          <input type="tel" name="no_hp" id="no_hp" 
-                 value="{{ pekerja.no_hp }}" 
-                 placeholder="Masukkan nomor HP"
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
-        </div>
+        <!-- Second Column -->
+        <div class="space-y-4">
+          <!-- Nama Bank -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">Nama Bank</label>
+            <select name="nama_bank" id="nama_bank"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+              <option value="">Pilih Bank</option>
+              <option value="GoPay" {% if pekerja.nama_bank == "GoPay" %}selected{% endif %}>GoPay</option>
+              <option value="OVO" {% if pekerja.nama_bank == "OVO" %}selected{% endif %}>OVO</option>
+              <option value="Virtual Account BCA" {% if pekerja.nama_bank == "Virtual Account BCA" %}selected{% endif %}>Virtual Account BCA</option>
+              <option value="Virtual Account BNI" {% if pekerja.nama_bank == "Virtual Account BNI" %}selected{% endif %}>Virtual Account BNI</option>
+              <option value="Virtual Account Mandiri" {% if pekerja.nama_bank == "Virtual Account Mandiri" %}selected{% endif %}>Virtual Account Mandiri</option>
+            </select>
+          </div>
 
-        <!-- Tanggal Lahir -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">Tanggal Lahir :</label>
-          <input type="date" name="tanggal_lahir" id="tanggal_lahir" 
-                 value="{{ pekerja.tanggal_lahir|date:'Y-m-d' }}" 
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
-        </div>
+          <!-- No Rekening -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">No Rekening</label>
+            <input type="text" name="no_rekening" id="no_rekening" 
+                   value="{{ pekerja.no_rekening }}" 
+                   placeholder="Masukkan nomor rekening"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
+          </div>
 
-        <!-- Alamat -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">Alamat :</label>
-          <input type="text" name="alamat" id="alamat" 
-                 value="{{ pekerja.alamat }}" 
-                 placeholder="Masukkan alamat"
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
-        </div>
+          <!-- NPWP -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">NPWP</label>
+            <input type="text" name="npwp" id="npwp" 
+                   value="{{ pekerja.npwp }}" 
+                   placeholder="Masukkan NPWP"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
+          </div>
 
-        <!-- Nama Bank -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">Nama Bank :</label>
-          <select name="nama_bank" id="nama_bank"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-            <option value="">Pilih Bank</option>
-            <option value="GoPay" {% if pekerja.nama_bank == "GoPay" %}selected{% endif %}>GoPay</option>
-            <option value="OVO" {% if pekerja.nama_bank == "OVO" %}selected{% endif %}>OVO</option>
-            <option value="Virtual Account BCA" {% if pekerja.nama_bank == "Virtual Account BCA" %}selected{% endif %}>Virtual Account BCA</option>
-            <option value="Virtual Account BNI" {% if pekerja.nama_bank == "Virtual Account BNI" %}selected{% endif %}>Virtual Account BNI</option>
-            <option value="Virtual Account Mandiri" {% if pekerja.nama_bank == "Virtual Account Mandiri" %}selected{% endif %}>Virtual Account Mandiri</option>
-          </select>
-        </div>
-
-        <!-- No Rekening -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">No Rekening :</label>
-          <input type="text" name="no_rekening" id="no_rekening" 
-                 value="{{ pekerja.no_rekening }}" 
-                 placeholder="Masukkan nomor rekening"
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
-        </div>
-
-        <!-- NPWP -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">NPWP :</label>
-          <input type="text" name="npwp" id="npwp" 
-                 value="{{ pekerja.npwp }}" 
-                 placeholder="Masukkan NPWP"
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
-        </div>
-
-        <!-- URL Foto -->
-        <div class="flex items-center">
-          <label class="block text-gray-700 w-32">URL Foto :</label>
-          <input type="url" name="url_foto" id="url_foto" 
-                 value="{{ pekerja.url_foto }}" 
-                 placeholder="Masukkan URL foto"
-                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                 required>
+          <!-- URL Foto -->
+          <div class="space-y-2">
+            <label class="block text-gray-700 font-medium text-xs">URL Foto</label>
+            <input type="url" name="url_foto" id="url_foto" 
+                   value="{{ pekerja.url_foto }}" 
+                   placeholder="Masukkan URL foto"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   required>
+          </div>
         </div>
       </div>
 
