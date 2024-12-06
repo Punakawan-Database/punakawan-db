@@ -12,7 +12,8 @@
   <div class="mt-10 bg-white/95 shadow-2xl rounded-2xl p-6 w-full max-w-2xl transform hover:scale-[1.02] transition-all duration-300">
     <div class="flex items-center space-x-4 mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-gray-800">Form Update</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Update profile</h2>
+        <p class="text-sm text-gray-500">Update profile pekerja kamu.</p>
       </div>
     </div>
 
@@ -38,13 +39,13 @@
               <input type="radio" name="gender" value="L" 
                      {% if pekerja.gender == "L" %}checked{% endif %} 
                      class="form-radio">
-              <span class="ml-2">L</span>
+              <span class="ml-2">Laki-Laki</span>
             </label>
             <label class="inline-flex items-center">
               <input type="radio" name="gender" value="P" 
                      {% if pekerja.gender == "P" %}checked{% endif %} 
                      class="form-radio">
-              <span class="ml-2">P</span>
+              <span class="ml-2">Perempuan</span>
             </label>
           </div>
         </div>
@@ -63,7 +64,7 @@
         <div class="flex items-center">
           <label class="block text-gray-700 w-32">Tanggal Lahir :</label>
           <input type="date" name="tanggal_lahir" id="tanggal_lahir" 
-                 value="{{ pekerja.tanggal_lahir }}" 
+                 value="{{ pekerja.tanggal_lahir|date:'Y-m-d' }}" 
                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                  required>
         </div>
