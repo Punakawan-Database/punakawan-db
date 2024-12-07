@@ -232,6 +232,16 @@ def profile_pekerja(request):
         else:
             namabank = nomorrekening = npwp = linkfoto = rating = jmlpesananselesai = None
 
+        # fetch kategori jasa pekerja
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT kj.namakategori
+                FROM pekerja_kategori_jasa pkj
+                JOIN kategori_jasa kj ON pkj.kategorijasaid = kj.id
+                WHERE pkj.pekerjaid = %s
+            """, [user_id])
+            kategori_jasa = [row[0] for row in cursor.fetchall()]  # List of `namakategori`
+
         # context
         context = {
             'nama': nama,
@@ -246,6 +256,7 @@ def profile_pekerja(request):
             'linkfoto': linkfoto,
             'rating': rating,
             'jmlpesananselesai': jmlpesananselesai,
+            'kategori_jasa': kategori_jasa,
         }
 
         return render(request, 'profile_pekerja.html', context)

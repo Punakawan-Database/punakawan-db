@@ -83,13 +83,18 @@
         <p class="text-gray-800 font-semibold text-sm">{{ jmlpesananselesai }}</p>
       </div>
 
-      <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
-        <span class="block text-gray-500 text-xs font-medium mb-1">Kategori Pekerjaan</span>
-        <div class="text-gray-800 font-semibold text-sm">
-          <p>1. Jasa Pembersihan Rumah</p>
-          <p>2. Jasa Tukang Kebun</p>
-        </div>
-      </div>
+        <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+          <span class="block text-gray-500 text-xs font-medium mb-1">Kategori Pekerjaan</span>
+          <div class="text-gray-800 font-semibold text-sm">
+              {% if kategori_jasa %}
+                  {% for kategori in kategori_jasa %}
+                      <p>{{ forloop.counter }}. {{ kategori }}</p>
+                  {% endfor %}
+              {% else %}
+                  <p class="text-gray-500 italic">Belum ada kategori yang terdaftar.</p>
+              {% endif %}
+          </div>
+      </div>    
     </div>
 
     <div class="mt-6 flex justify-end">
