@@ -18,6 +18,13 @@ def register_pelanggan(request):
             nohp = request.POST.get('phone')
             tgllahir = parse_date(request.POST.get('dob'))  # parse date
             alamat = request.POST.get('address')
+            
+            # cek apakah nohp sudah teregister sebelumnya
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM pengguna WHERE nohp = %s", [nohp])
+                if cursor.fetchone()[0] > 0:
+                    messages.error(request, "Nomor handphone sudah terdaftar. Gunakan nomor lain.")
+                    return redirect('register_pelanggan') 
 
             # generate UUID
             user_id = str(uuid.uuid4())
@@ -62,8 +69,15 @@ def register_pekerja(request):
 
             # validasi input
             if not (nama and password and jeniskelamin and nohp and tgllahir and alamat and namabank and nomorrekening):
-                messages.error(request, "All fields marked with * are required.")
+                messages.error(request, "Semua field perlu diisi.")
                 return redirect('register_pekerja')
+            
+            # cek apakah nohp sudah teregister sebelumnya
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM pengguna WHERE nohp = %s", [nohp])
+                if cursor.fetchone()[0] > 0:
+                    messages.error(request, "Nomor handphone sudah terdaftar. Gunakan nomor lain.")
+                    return redirect('register_pekerja') 
 
             # generate UUID
             user_id = str(uuid.uuid4())

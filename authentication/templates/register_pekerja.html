@@ -9,10 +9,21 @@
 {% include 'navbar.html' %}
 
 <div class="relative h-screen flex justify-center items-center bg-blue-500 p-5">
-    <div class="mt-12 mb-12 relative bg-white p-6 rounded-2xl shadow-2xl transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl max-w-4xl w-full">
+    <div class="mt-12 relative bg-white p-6 rounded-2xl shadow-2xl transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl max-w-4xl w-full">
         <h1 class="text-blue-600 text-center mb-4 text-2xl font-bold">Registrasi Pekerja</h1>
+
+        <!-- Alert-->
+        {% if messages %}
+        <div class="col-span-1 md:col-span-2 bg-red-500 text-white text-center py-2 px-3 rounded-md mb-3">
+            {% for message in messages %}
+                <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <form method="post" class="grid grid-cols-3 gap-4">
             {% csrf_token %}
+
             <div class="flex flex-col">
                 <label for="name" class="text-blue-600 font-semibold mb-1">Nama:</label>
                 <input type="text" id="name" name="name" class="p-2 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
