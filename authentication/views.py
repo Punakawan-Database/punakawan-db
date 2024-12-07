@@ -19,6 +19,11 @@ def register_pelanggan(request):
             tgllahir = parse_date(request.POST.get('dob'))  # parse date
             alamat = request.POST.get('address')
             
+            # validasi input
+            if not (nama and password and jeniskelamin and nohp and tgllahir and alamat):
+                messages.error(request, "Semua field perlu diisi.")
+                return redirect('register_pelanggan')
+            
             # cek apakah nohp sudah teregister sebelumnya
             with connection.cursor() as cursor:
                 cursor.execute("SELECT COUNT(*) FROM pengguna WHERE nohp = %s", [nohp])
