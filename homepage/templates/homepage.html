@@ -76,17 +76,32 @@
                             {% for item in category.subcategories %}
                                 <li class="subcategory group"
                                     data-subcategory-name="{{ item.name }}">
-                                    <a href="{% url 'subkategori_jasa' kategori_slug=category.id subkategori_slug=item.id %}" 
-                                    class="text-blue-600 hover:text-blue-800 
-                                            transition duration-300 flex items-center 
-                                            group-hover:translate-x-2">
-                                        <svg class="h-4 w-4 mr-2 text-blue-400 
-                                                group-hover:text-blue-600 transition" 
-                                            fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                        {{ item.namasubkategori }}
-                                    </a>
+                                    {% if isPelanggan == True %}
+                                        <a href="{% url 'subkategori_jasa' kategori_slug=category.id subkategori_slug=item.id %}" 
+                                        class="text-blue-600 hover:text-blue-800 
+                                                transition duration-300 flex items-center 
+                                                group-hover:translate-x-2">
+                                            <svg class="h-4 w-4 mr-2 text-blue-400 
+                                                    group-hover:text-blue-600 transition" 
+                                                fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            {{ item.namasubkategori }}
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'subkategori_jasa_pekerja' kategori_slug=category.id subkategori_slug=item.id %}" 
+                                        class="text-blue-600 hover:text-blue-800 
+                                                transition duration-300 flex items-center 
+                                                group-hover:translate-x-2">
+                                            <svg class="h-4 w-4 mr-2 text-blue-400 
+                                                    group-hover:text-blue-600 transition" 
+                                                fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            {{ item.namasubkategori }}
+                                        </a>
+                                    {% endif %} 
+                                    
                                 </li>
                             {% endfor %}
                         </ol>

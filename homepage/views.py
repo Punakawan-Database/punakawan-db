@@ -2,6 +2,12 @@ from django.shortcuts import render
 from django.urls import *
 from utils import db;
 
+from django.contrib.auth import get_user
+from json import dumps 
+import requests
+# from django.contrib.auth.models import UserProfile
+# from django.auth.models import UserProfile
+
 # Create your views here.
 
 fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
@@ -25,13 +31,22 @@ for j in fetch_categories:
 
 categories = fetch_categories
 
-
-
 testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
 # print(testimoni[0])
 
 def homepage(request):
+    # user = get_user(request)
+    userID = request.session.get('user_id')
+    # print(userID + " FFF")
+    
+    isPelanggan = False
+    for x in pelanggan:
+        if str(x['id']) == userID:
+            isPelanggan = True
+    
+    # print(isPelanggan)
     context = {
+        'isPelanggan' : isPelanggan,
         'title' : 'Trust in Punakawan, because we dont trust ourselves',
         'categories': categories,
     }
@@ -128,6 +143,12 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug):
     # print(metode_bayar)
     
     discID = db.query_all("select * from diskon")
+    discID_key = list()
+    for x in discID:
+        discID_key.append(x['kode'])
+        x['potongan'] = int(x['potongan'])
+        
+    # print(dumps(discID_key))
     context = {
         'selected_category': selected_category[0],
         'selected_subcategory': selected_subcategory,
@@ -136,12 +157,16 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug):
         'workers': workers_lengkap,
         'testimonials' : selected_testimoni,
         'metode_bayar' : metode_bayar,
-        'discount_be' : discID,
+        'discount_be' : dumps(discID_key),
     }
     
     return render(request, "subkategori.html", context= context)
 
-
+# def verify_discount(request):
+#     print("TT")
+#     return "TESTINGGGGGG"
+    
+    
 def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
     selected_category = []
     for x in categories:
@@ -222,70 +247,54 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
     
     return render(request, 'subkategori_pekerja.html', context)
 
-orders = [
-        {
-            'id': 1,
-            'subcategory': 'House Cleaning',
-            'service_session': 'Basic Cleaning (2 hours)',
-            'total_payment': '150000',
-            'worker': 'John Doe',
-            'status': 'waiting_payment',
-            'has_testimonial': False,
-            'get_status_display': 'Menunggu Pembayaran'
-        },
-        {
-            'id': 2,
-            'subcategory': 'House Cleaning',
-            'service_session': 'Deep Cleaning (4 hours)',
-            'total_payment': '300000',
-            'worker': None,
-            'status': 'finding_worker',
-            'has_testimonial': False,
-            'get_status_display': 'Mencari Pekerja Terdekat'
-        },
-        {
-            'id': 3,
-            'subcategory': 'House Cleaning',
-            'service_session': 'Premium Cleaning (6 hours)',
-            'total_payment': '450000',
-            'worker': 'Jane Smith',
-            'status': 'completed',
-            'has_testimonial': False,
-            'get_status_display': 'Pesanan Selesai'
-        },
-        {
-            'id': 4,
-            'subcategory': 'House Cleaning',
-            'service_session': 'Basic Cleaning (2 hours)',
-            'total_payment': '150000',
-            'worker': 'Bob Johnson',
-            'status': 'completed',
-            'has_testimonial': True,
-            'get_status_display': 'Pesanan Selesai'
-        }
-    ]
+orders_bak = db.query_all("select * from tr_pemesanan_jasa left join testimoni on tr_pemesanan_jasa.id = testimoni.idtrpemesanan, tr_pemesanan_status, status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id;")
+# print(orders_bak)
+# print(pengguna)
+for j in orders_bak:
+    for i in pengguna:
+        if str(j['idpekerja']) == str(i['id']):
+            j['worker'] = i['nama']
+            
+for j in orders_bak:
+    for i in fetch_sub_categories:
+        if str(j['idkategorijasa']) == str(i['id']):
+            j['subcategory'] = i['namasubkategori']
+            
+for j in orders_bak:
+    for i in pengguna:
+        if str(j['idpelanggan']) == str(i['id']):
+            j['customer'] = i['nama']
+            
+# print(orders_bak[0])
 
-order = db.query_all("select * from tr_pemesanan_status, tr_pemesanan_jasa, pekerja, pelanggan status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id and tr_pemesanan_jasa.idpelanggan=pelanggan.id and tr_pemesanan_jasa.idpekerja=pekerja.id")
-print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
+orders = orders_bak
+
+# order = db.query_all("select * from tr_pemesanan_status, tr_pemesanan_jasa, pekerja, pelanggan status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id and tr_pemesanan_jasa.idpelanggan=pelanggan.id and tr_pemesanan_jasa.idpekerja=pekerja.id")
+# print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
 
 def view_pemesanan(request):
-    subcategories = []
+    # subcategories = []
 
-    for order in orders:
-        if order['subcategory'] not in subcategories:
-            subcategories.append(order['subcategory'])
+    # for order in orders:
+    #     if order['subcategory'] not in subcategories:
+    #         subcategories.append(order['subcategory'])
 
-    statusses = []
+    # statusses = []
 
-    for order in orders:
-        if order['get_status_display'] not in statusses:
-            statusses.append(order['get_status_display'])
-
+    # for order in orders:
+    #     if order['get_status_display'] not in statusses:
+    #         statusses.append(order['get_status_display'])
+    selected_orders = []
+    
+    for xx in orders:
+        if str(xx['idpelanggan']) == str(request.session.get('user_id')):
+            selected_orders.append(xx)
+            
+    print(selected_orders)
+            
     context = {
         'title' : 'Pemesanan',
-        'orders': orders,
-        'subcategories': subcategories,
-        'statusses': statusses,
+        'orders': selected_orders,
         }
     
     return render(request, 'pemesanan_jasa.html', context)

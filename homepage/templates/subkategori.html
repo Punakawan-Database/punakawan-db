@@ -147,7 +147,7 @@
                             placeholder="Masukkan kode diskon" 
                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                             pattern="[A-Za-z0-9]+">
-                        <button id="applyDiscount" 
+                        <button id="applyDiscount"
                                 class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors duration-200">
                             Terapkan
                         </button>
@@ -198,6 +198,7 @@
 </div>
 
 <script>
+
     document.addEventListener('DOMContentLoaded', function() {
         // Format current date
         const formatDate = () => {
@@ -257,15 +258,20 @@
     
         // Handle discount code
         applyDiscountBtn.addEventListener('click', () => {
+            // window.alert('Applying discount');
             const discountCode = discountInput.value.trim();
-            console.log(discountCode);
-            if (discountCode in discount_be) {
-                // Here you would typically validate the discount code with your backend
-                discountApplied.classList.remove('hidden');
-                setTimeout(() => {
-                    discountApplied.classList.add('hidden');
-                }, 3000);
-            }
+            // window.alert(discountCode);
+            try {
+                const discID = JSON.parse('{{ discount_be|safe|escapejs }}');
+
+                for (let i = 0; i < discID.length; i++) {
+                    if (discID[i] === discountCode) {
+                        window.alert("Diskon berhasil diterapkan!");
+                    }
+                }
+            } catch (e) {
+                window.alert("LHO LAPO O IKI MUMET NDASKU " + e.message);
+            }            
         });
     
         // Handle order submission

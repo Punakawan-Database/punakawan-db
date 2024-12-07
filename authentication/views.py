@@ -104,8 +104,11 @@ def login(request):
                 WHERE nohp = %s AND pwd = %s
             """, [no_hp, password])
             user_result = cursor.fetchone()
+            print(user_result)
 
         if user_result:
+            request.session['user_id'] = str(user_result[0]) # simpan user id ke session
+            # print(request.session['user_id'] + " FF")
             user_id, user_nohp = user_result
 
             # menentukan role
@@ -133,7 +136,7 @@ def login(request):
         # error handling
         messages.error(request, 'Invalid credentials.')
         return redirect('login')
-
+    
     return render(request, 'login.html')
 
 def profile_pelanggan(request):

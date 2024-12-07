@@ -13,4 +13,8 @@ urlpatterns = [
     path('pemesanan_jasa/',
         views.view_pemesanan,
         name='view_pemesanan'),
+    
+    # path('vd/',
+    #     views.verify_discount,
+    #     name='vd'),
 ]
