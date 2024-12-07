@@ -5,7 +5,11 @@
 {% endblock meta %}
 
 {% block content %}
-{% include 'navbar.html' %}
+{% if isPelanggan == True %}
+    {% include 'navbar_pelanggan.html' %}
+{% else %}
+    {% include 'navbar_pekerja.html' %}
+{% endif %}
 <div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 py-8 px-4 pt-16">
     <div class="max-w-5xl mx-auto">
         <!-- Animated Header -->
