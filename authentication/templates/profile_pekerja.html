@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block meta %}
 <title>Worker Profile</title>
@@ -55,7 +56,7 @@
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
         <span class="block text-gray-500 text-xs font-medium mb-1">Saldo MyPay</span>
-        <p class="text-gray-800 font-semibold text-sm">{{ saldo }}</p>
+        <p class="text-gray-800 font-semibold text-sm">{{ saldo|format_idr }}</p>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
@@ -75,7 +76,8 @@
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
         <span class="block text-gray-500 text-xs font-medium mb-1">Rating</span>
-        <p class="text-gray-800 font-semibold text-sm">{{ rating }}</p>
+        <span class="text-yellow-500">★</span>
+        <span class="text-gray-800 font-semibold text-sm">{{ rating }}</span>
       </div>
 
       <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
