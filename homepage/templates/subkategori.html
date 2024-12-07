@@ -25,7 +25,7 @@
                 <div class="flex flex-col gap-4 rounded-2xl overflow-hidden border-2 border-blue-500/20 
                     transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg p-6 bg-white">
                     
-                    <span class="font-semibold text-xl text-center text-gray-800">{{ session.sesi }}</span>
+                    <span class="font-semibold text-xl text-center text-gray-800">Sesi {{ session.sesi }}</span>
                     <span class="font-bold text-2xl text-blue-600 text-center">Rp {{ session.harga }}</span>
 
                     <button class="open-modal-btn bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 
@@ -224,12 +224,14 @@
         const discountApplied = document.getElementById('discountApplied');
         
         // Add this line to get the price display element
-        const totalPriceDisplay = document.querySelector('.text-2xl.font-bold.text-blue-700');
-
+        let totalPriceDisplay = document.querySelector('.text-2xl.font-bold.text-blue-700');
+        // let price = btn.getAttribute('data-price');
+        // let price = document.getElementById('data-price');
+        let price = 0;
         // Modify the open modal event
         openModalBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const price = btn.getAttribute('data-price');
+                price = btn.getAttribute('data-price');
                 const sessionName = btn.getAttribute('data-session-name');
                 
                 // Update the price in the modal
@@ -260,25 +262,36 @@
         applyDiscountBtn.addEventListener('click', () => {
             // window.alert('Applying discount');
             const discountCode = discountInput.value.trim();
+
+            let isdiscountAda = false;
+            let discountAmount = 0;
             // window.alert(discountCode);
             try {
                 const discID = JSON.parse('{{ discount_be|safe|escapejs }}');
 
                 for (let i = 0; i < discID.length; i++) {
-                    if (discID[i] === discountCode) {
+                    if (discID[i][0] === discountCode) {
                         window.alert("Diskon berhasil diterapkan!");
+                        discountAmount = discID[i][1];
+                        isdiscountAda = true;
                     }
                 }
             } catch (e) {
                 window.alert("LHO LAPO O IKI MUMET NDASKU " + e.message);
-            }            
+            }        
+            
+            totalPriceDisplay.textContent = `Rp ${price-discountAmount}`;
+            // window.alert(totalPriceDisplay.textConten); 
         });
     
         // Handle order submission
         orderButton.addEventListener('click', (e) => {
             e.preventDefault();
             // Here you would typically handle the order submission
-            window.location.href = "{% url 'view_pemesanan' %}";
+            selectedValue = paymentMethod.value;
+            const url = "{% url 'view_pemesanan' metode='PLACEHOLDER' %}".replace('PLACEHOLDER', selectedValue);
+            
+            window.location.href = url;
         });
     
         // Prevent form submission on enter key

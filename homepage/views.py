@@ -145,10 +145,10 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug):
     discID = db.query_all("select * from diskon")
     discID_key = list()
     for x in discID:
-        discID_key.append(x['kode'])
+        discID_key.append([x['kode'], int(x['potongan'])])
         x['potongan'] = int(x['potongan'])
         
-    # print(dumps(discID_key))
+    print(dumps(discID_key))
     context = {
         'selected_category': selected_category[0],
         'selected_subcategory': selected_subcategory,
@@ -272,7 +272,9 @@ orders = orders_bak
 # order = db.query_all("select * from tr_pemesanan_status, tr_pemesanan_jasa, pekerja, pelanggan status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id and tr_pemesanan_jasa.idpelanggan=pelanggan.id and tr_pemesanan_jasa.idpekerja=pekerja.id")
 # print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
 
-def view_pemesanan(request):
+def view_pemesanan(request, metode):
+    print(metode+" FFF")
+    # db.query_one(f"INSERT INTO tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) VALUES ({request.session.get('user_id')}, {'null'}, {request.POST['subkategori']}, {request.POST['metode_bayar']}, {request.POST['diskon']}, 1, '{request.POST['tanggal']}')")
     # subcategories = []
 
     # for order in orders:
@@ -298,3 +300,6 @@ def view_pemesanan(request):
         }
     
     return render(request, 'pemesanan_jasa.html', context)
+
+# def buat_order(request):
+#     db.query_one(f"INSERT INTO tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) VALUES ({request.session.get('user_id')}, {request.POST['pekerja']}, {request.POST['subkategori']}, {request.POST['metode_bayar']}, {request.POST['diskon']}, 1, '{request.POST['tanggal']}')")
