@@ -29,7 +29,7 @@
                                     text-gray-700 appearance-none focus:outline-none 
                                     focus:border-blue-500 transition duration-300 
                                     bg-white pr-8 hover:border-blue-400">
-                        <option selected disabled hidden>Select Kategori</option>
+                        <option selected>Select Category (All)</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.namakategori }}</option>
                         {% endfor %}
@@ -68,7 +68,7 @@
 
         <!-- Categories Section with Card-like Design -->
         <div class="grid md:grid-cols-2 gap-8">
-            {% for category in categories %}
+            {% for category in selected_category %}
                 <div id = "list_kategori "class="bg-white rounded-2xl shadow-lg overflow-hidden 
                             transform transition-all hover:scale-[1.03] hover:shadow-2xl category"
                     data-category-slug="{{ category.id }}">
@@ -119,39 +119,56 @@
 <script>
     document.getElementById("submit").addEventListener("click", function () {
         const selectedCategory = document.getElementById("Kategori").value;
-        const searchInput = document.getElementById("search_subkategori").value.toLowerCase();
-        const categories = document.querySelectorAll(".category");
+        let searchInput = document.getElementById("search_subkategori").value;
+        // const categories = document.querySelectorAll(".category");
+        // window.alert("FF"+searchInput+"AA");
 
         // window.alert(categories);
 
-        categories.forEach(category => {
-            // window.alert("A")
-            // window.alert(category);
-            // window.alert('F')
-            const categorySlug = category.getAttribute("data-category-slug");
-            // window.alert(categorySlug);
-            // // window.alert(categorySlug);
-            const subcategories = category.querySelectorAll(".subcategory");
-            let categoryVisible = false;
+        let url = ``;
+        if (searchInput !== '') {
+            searchInput = searchInput.toLowerCase();
+            url = `/homepage/${selectedCategory}/${searchInput}`;
+        } else {
+            url = `/homepage/${selectedCategory}`;
+        }
 
-            if (!selectedCategory || categorySlug === selectedCategory) {
-                // window.alert('FF')
-                subcategories.forEach(subcategory => {
-                    const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
-                    // window.alert(subcategoryName);
-                    if (!searchInput || subcategoryName.includes(searchInput)) {
-                        subcategory.style.display = "list-item";
-                        categoryVisible = true;
-                    } else {
-                        subcategory.style.display = "none";
-                    }
-                });
+        if (selectedCategory === 'Select Category (All)') {
+            url = `/homepage/`;
+        }
 
-                category.style.display = categoryVisible ? "block" : "none";
-            } else {
-                category.style.display = "none";
-            }
-        });
+        // const url = `/homepage/${selectedCategory}/${searchInput}`;
+        
+        window.location.href = url;
+
+        // categories.forEach(category => {
+        //     // window.alert("A")
+        //     // window.alert(category);
+        //     // window.alert('F')
+        //     const categorySlug = category.getAttribute("data-category-slug");
+        //     // window.alert(categorySlug);
+        //     // // window.alert(categorySlug);
+        //     const subcategories = category.querySelectorAll(".subcategory");
+        //     let categoryVisible = false;
+
+        //     if (!selectedCategory || categorySlug === selectedCategory) {
+        //         // window.alert('FF')
+        //         subcategories.forEach(subcategory => {
+        //             const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
+        //             // window.alert(subcategoryName);
+        //             if (!searchInput || subcategoryName.includes(searchInput)) {
+        //                 subcategory.style.display = "list-item";
+        //                 categoryVisible = true;
+        //             } else {
+        //                 subcategory.style.display = "none";
+        //             }
+        //         });
+
+        //         category.style.display = categoryVisible ? "block" : "none";
+        //     } else {
+        //         category.style.display = "none";
+        //     }
+        // });
     });
 </script>
 

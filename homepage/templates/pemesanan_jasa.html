@@ -18,9 +18,9 @@
                             class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg 
                                 text-gray-700 appearance-none focus:outline-none 
                                 focus:border-blue-500 transition duration-300 bg-white pr-8">
-                        <option selected disabled hidden>Select Subkategori</option>
-                        {% for order in orders %}
-                            <option value="{{ order.subcategory }}">{{ order.subcategory }}</option>
+                        <option selected>Select Subkategori (All)</option>
+                        {% for s in subcategories %}
+                            <option value="{{ s }}">{{ s }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -31,9 +31,9 @@
                             class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg 
                                 text-gray-700 appearance-none focus:outline-none 
                                 focus:border-blue-500 transition duration-300 bg-white pr-8">
-                        <option selected disabled hidden>Status Pesanan</option>
-                        {% for order in orders %}
-                            <option value="{{ order.status }}">{{ order.status }}</option>
+                        <option selected>Status Pesanan (ALL) </option>
+                        {% for i in statusses %}
+                            <option value="{{ i }}">{{ i }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -52,9 +52,10 @@
 
         <!-- Orders Section -->
         <div class="grid grid-cols-1 gap-6">
-            {% for order in orders %}
+            {% for order in s_orders %}
             <div class="order bg-white rounded-2xl shadow-lg p-6" subcategory="{{ order.subcategory }}" status="{{ order.status }}">
                 <p class="mb-4">
+                    <strong>ID:</strong> {{ order.idtrpemesanan }}<br>
                     <strong>Subkategori:</strong> {{ order.subcategory }}<br>
                     <strong>Service Session:</strong> {{ order.sesi }}<br>
                     <strong>Total Payment:</strong> {{ order.totalbiaya }}<br>
@@ -64,13 +65,13 @@
                 </p>
 
                 <!-- Action Buttons -->
-                {% if order.get_status_display == "Menunggu Pembayaran" or order.get_status_display == "Mencari Pekerja Terdekat" %}
-                    <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                {% if order.status == "Menunggu Pembayaran" or order.status == "Mencari Pekerja Terdekat" %}
+                    <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" onclick="batalkan('{{ order.status }}', '{{ order.totalbiaya }}', '{{ order.idtrpemesanan }}')">
                         Batalkan
                     </button>
                 {% endif %}
 
-                {% if order.get_status_display == "Pesanan Selesai" %}
+                {% if order.status == "Pesanan Selesai" %}
                 <button onclick="openTestimoniModal()"
                         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                     Buat Testimoni
@@ -159,32 +160,27 @@
         const selectedStatus = document.getElementById("status_pesanan").value;
 
         // Select all order elements
-        const orders = document.querySelectorAll('.order');
+        // const orders = document.querySelectorAll('.order');
+        if (selectedSubcategory == "Select Subkategori (All)" && selectedStatus == "Status Pesanan (ALL)") {
+            window.location.href = "/homepage//pemesanan_jasa/";
+        } else if (selectedSubcategory == "Select Subkategori (All)") {
+            window.location.href = "/homepage//pemesanan_jasa/" + selectedStatus;
+        } else if (selectedStatus == "Status Pesanan (ALL)") {
+            window.location.href = "/homepage//pemesanan_jasa/" + selectedSubcategory;
+        } else {
+            window.location.href = "/homepage//pemesanan_jasa/" + selectedSubcategory + "/" + selectedStatus;
+        }
+    }
 
-        // window.alert(selectedSubcategory);
-        // window.alert(selectedStatus);
-
-        // Loop through each order to determine visibility
-        orders.forEach(order => {
-            // window.alert("FFF");
-            const orderSubcategory = order.getAttribute("subcategory");
-            const orderStatus = order.getAttribute("status");
-            // window.alert(selectedStatus);
-            // window.alert(orderStatus);
-
-            // Determine if the order matches filters
-            const matchesSubcategory = orderSubcategory === selectedSubcategory;
-            const matchesStatus = orderStatus === selectedStatus;
-
-            // window.alert(matchesSubcategory, matchesStatus, selectedSubcategory, selectedStatus, orderSubcategory, orderStatus);
-            // window.alert(selectedSubcategory)
-            // Show or hide order based on filters
-            if (matchesSubcategory && matchesStatus) {
-                order.style.display = "block"; // Show matching order
-            } else {
-                order.style.display = "none"; // Hide non-matching order
-            }
-        });
+    function batalkan(status, totalbiaya, id) {
+        // window.alert(status);
+        // window.alert(totalbiaya);
+        if (status == "Menunggu Pembayaran") {
+            window.location.href = `/homepage//batalkan_pesanan/${id}`;
+            // window.alert("BISA DIBATALKAN");
+        } else {
+            window.location.href = `/homepage//batalkan_pesanan/${id}/${totalbiaya}`;
+        }
     }
 </script>
 {% endblock content %}
