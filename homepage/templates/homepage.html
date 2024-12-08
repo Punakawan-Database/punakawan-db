@@ -5,7 +5,11 @@
 {% endblock meta %}
 
 {% block content %}
-{% include 'navbar.html' %}
+{% if isPelanggan == True %}
+    {% include 'navbar_pelanggan.html' %}
+{% else %}
+    {% include 'navbar_pekerja.html' %}
+{% endif %}
 <div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 py-8 px-4 pt-16">
     <div class="max-w-5xl mx-auto">
         <!-- Animated Header -->
@@ -65,7 +69,7 @@
         <!-- Categories Section with Card-like Design -->
         <div class="grid md:grid-cols-2 gap-8">
             {% for category in categories %}
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden 
+                <div id = "list_kategori "class="bg-white rounded-2xl shadow-lg overflow-hidden 
                             transform transition-all hover:scale-[1.03] hover:shadow-2xl category"
                     data-category-slug="{{ category.id }}">
                     <div class="p-6">
@@ -75,7 +79,7 @@
                         <ol class="space-y-2">
                             {% for item in category.subcategories %}
                                 <li class="subcategory group"
-                                    data-subcategory-name="{{ item.name }}">
+                                    data-subcategory-name="{{ item.namasubkategori }}">
                                     {% if isPelanggan == True %}
                                         <a href="{% url 'subkategori_jasa' kategori_slug=category.id subkategori_slug=item.id %}" 
                                         class="text-blue-600 hover:text-blue-800 
@@ -118,14 +122,23 @@
         const searchInput = document.getElementById("search_subkategori").value.toLowerCase();
         const categories = document.querySelectorAll(".category");
 
+        // window.alert(categories);
+
         categories.forEach(category => {
+            // window.alert("A")
+            // window.alert(category);
+            // window.alert('F')
             const categorySlug = category.getAttribute("data-category-slug");
+            // window.alert(categorySlug);
+            // // window.alert(categorySlug);
             const subcategories = category.querySelectorAll(".subcategory");
             let categoryVisible = false;
 
             if (!selectedCategory || categorySlug === selectedCategory) {
+                // window.alert('FF')
                 subcategories.forEach(subcategory => {
                     const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
+                    // window.alert(subcategoryName);
                     if (!searchInput || subcategoryName.includes(searchInput)) {
                         subcategory.style.display = "list-item";
                         categoryVisible = true;

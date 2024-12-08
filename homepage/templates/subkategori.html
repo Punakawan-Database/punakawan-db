@@ -5,7 +5,7 @@
 {% endblock meta %}
 
 {% block content %}
-{% include 'navbar.html' %}
+{% include 'navbar_pelanggan.html' %}
 <div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 py-12 px-4 md:px-8 lg:px-40">
     <!-- Hero Section with improved spacing and typography -->
     <div class="max-w-6xl mx-auto">
@@ -228,11 +228,12 @@
         // let price = btn.getAttribute('data-price');
         // let price = document.getElementById('data-price');
         let price = 0;
+        let sessionName = -1; // session name sentinel
         // Modify the open modal event
         openModalBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 price = btn.getAttribute('data-price');
-                const sessionName = btn.getAttribute('data-session-name');
+                sessionName = btn.getAttribute('data-session-name');
                 
                 // Update the price in the modal
                 totalPriceDisplay.textContent = `Rp ${price}`;
@@ -258,12 +259,14 @@
             orderButton.disabled = !paymentMethod.value;
         });
     
+        let isdiscountAda = false;
+
         // Handle discount code
         applyDiscountBtn.addEventListener('click', () => {
             // window.alert('Applying discount');
             const discountCode = discountInput.value.trim();
 
-            let isdiscountAda = false;
+            
             let discountAmount = 0;
             // window.alert(discountCode);
             try {
@@ -274,13 +277,15 @@
                         window.alert("Diskon berhasil diterapkan!");
                         discountAmount = discID[i][1];
                         isdiscountAda = true;
+                        break;
                     }
                 }
             } catch (e) {
                 window.alert("LHO LAPO O IKI MUMET NDASKU " + e.message);
             }        
             
-            totalPriceDisplay.textContent = `Rp ${price-discountAmount}`;
+            price = price - discountAmount;
+            totalPriceDisplay.textContent = `Rp ${price}`;
             // window.alert(totalPriceDisplay.textConten); 
         });
     
@@ -289,7 +294,21 @@
             e.preventDefault();
             // Here you would typically handle the order submission
             selectedValue = paymentMethod.value;
-            const url = "{% url 'view_pemesanan' metode='PLACEHOLDER' %}".replace('PLACEHOLDER', selectedValue);
+            // const url = `/homepage/pemesanan_jasa/${selectedValue}/`;
+            // window.alert('{{ selected_subcategory.id }}');
+            subkategori = '{{ selected_subcategory.id }}';
+            const sessionID = sessionName;
+            const paymentMethodid = paymentMethod.value;
+
+            // window.alert(sessioniD);
+            let url = '';
+            if (!isdiscountAda) {
+                // url = '/homepage/pesan/''
+                url = `/homepage/pesan/${subkategori}/${sessionID}/${paymentMethodid}/${price}`;
+            } else {
+                url = `/homepage/pesan/${subkategori}/${sessionID}/${paymentMethodid}/${price}/${discountInput.value}`;
+            }
+            
             
             window.location.href = url;
         });

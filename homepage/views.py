@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import *
 from utils import db;
 
 from django.contrib.auth import get_user
 from json import dumps 
 import requests
+
+from datetime import date, datetime
 # from django.contrib.auth.models import UserProfile
 # from django.auth.models import UserProfile
 
@@ -67,6 +69,8 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug):
     for x in selected_category[0]["subcategories"]:
         if str(x["id"]) == str(subkategori_slug):
             selected_subcategory = x
+            
+    # print(selected_subcategory)
     
     # print(selected_subcategory)
     # print(type(selected_category[0]))
@@ -148,7 +152,7 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug):
         discID_key.append([x['kode'], int(x['potongan'])])
         x['potongan'] = int(x['potongan'])
         
-    print(dumps(discID_key))
+    # print(dumps(discID_key))
     context = {
         'selected_category': selected_category[0],
         'selected_subcategory': selected_subcategory,
@@ -168,6 +172,9 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug):
     
     
 def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
+    userID = request.session.get('user_id')
+    print(str(userID) + " userID")
+    
     selected_category = []
     for x in categories:
         if str(x["id"]) == str(kategori_slug):
@@ -238,7 +245,8 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
 
     # print(selected_testimoni)
     context = {
-        'selected_category': selected_category[0],
+        'category_slug' : str(kategori_slug),
+        'selected_category' : selected_category[0],
         'selected_subcategory': selected_subcategory,
         'service_sessions': service_sessions,
         'workers': workers_lengkap,
@@ -247,33 +255,36 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
     
     return render(request, 'subkategori_pekerja.html', context)
 
-orders_bak = db.query_all("select * from tr_pemesanan_jasa left join testimoni on tr_pemesanan_jasa.id = testimoni.idtrpemesanan, tr_pemesanan_status, status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id;")
-# print(orders_bak)
-# print(pengguna)
-for j in orders_bak:
-    for i in pengguna:
-        if str(j['idpekerja']) == str(i['id']):
-            j['worker'] = i['nama']
-            
-for j in orders_bak:
-    for i in fetch_sub_categories:
-        if str(j['idkategorijasa']) == str(i['id']):
-            j['subcategory'] = i['namasubkategori']
-            
-for j in orders_bak:
-    for i in pengguna:
-        if str(j['idpelanggan']) == str(i['id']):
-            j['customer'] = i['nama']
-            
-# print(orders_bak[0])
 
-orders = orders_bak
+# print(orders)
 
 # order = db.query_all("select * from tr_pemesanan_status, tr_pemesanan_jasa, pekerja, pelanggan status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id and tr_pemesanan_jasa.idpelanggan=pelanggan.id and tr_pemesanan_jasa.idpekerja=pekerja.id")
 # print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
 
-def view_pemesanan(request, metode):
-    print(metode+" FFF")
+def view_pemesanan(request):
+    orders_bak = db.query_all("select * from tr_pemesanan_jasa left join testimoni on tr_pemesanan_jasa.id = testimoni.idtrpemesanan, tr_pemesanan_status, status_pesanan where tr_pemesanan_status.idtrpemesanan = tr_pemesanan_jasa.id and tr_pemesanan_status.idstatus = status_pesanan.id;")
+    # print(orders_bak)
+    # print(pengguna)
+    for j in orders_bak:
+        for i in pengguna:
+            if str(j['idpekerja']) == str(i['id']):
+                j['worker'] = i['nama']
+                
+    for j in orders_bak:
+        for i in fetch_sub_categories:
+            if str(j['idkategorijasa']) == str(i['id']):
+                j['subcategory'] = i['namasubkategori']
+                
+    for j in orders_bak:
+        for i in pengguna:
+            if str(j['idpelanggan']) == str(i['id']):
+                j['customer'] = i['nama']
+                
+    # print(orders_bak[0])
+
+    orders = orders_bak
+    
+    # print(metode+" FFF")
     # db.query_one(f"INSERT INTO tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) VALUES ({request.session.get('user_id')}, {'null'}, {request.POST['subkategori']}, {request.POST['metode_bayar']}, {request.POST['diskon']}, 1, '{request.POST['tanggal']}')")
     # subcategories = []
 
@@ -288,7 +299,9 @@ def view_pemesanan(request, metode):
     #         statusses.append(order['get_status_display'])
     selected_orders = []
     
+    # print(request.session.get('user_id'))
     for xx in orders:
+        # print(f"FFF {request.session.get('user_id')} {xx['idpelanggan']}")
         if str(xx['idpelanggan']) == str(request.session.get('user_id')):
             selected_orders.append(xx)
             
@@ -303,3 +316,36 @@ def view_pemesanan(request, metode):
 
 # def buat_order(request):
 #     db.query_one(f"INSERT INTO tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) VALUES ({request.session.get('user_id')}, {request.POST['pekerja']}, {request.POST['subkategori']}, {request.POST['metode_bayar']}, {request.POST['diskon']}, 1, '{request.POST['tanggal']}')")
+
+def bergabung(request, kategori):
+    userID = request.session.get('user_id')
+    userID = str(userID)
+    
+    db.query_one(f"insert into pekerja_kategori_jasa values('{userID}', '{kategori}')")
+    # print(kategori)
+    
+    return redirect('homepage')
+
+def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
+    userID = request.session.get('user_id')
+    userID = str(userID)
+    
+    uuid_generator = db.query_one("select uuid_generate_v4()")
+    uuid_generator = uuid_generator['uuid_generate_v4']
+    dates = date.today()
+    timestamp = datetime.now()
+    if (idDiskon == None):
+        # print(uuid_generator['uuid_generate_v4'])
+        # print("FFF")
+        db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', null, '{idMetodeBayar}')")
+        db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
+    else:
+        db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', '{idDiskon}', '{idMetodeBayar}')")
+        db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
+    # print(f"{idKategoriJasa} {Sesi} {idMetodeBayar} {idDiskon}")
+    
+    
+    # db.query_one(f"insert into tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) values('{userID}', null, '{idKategoriJasa}', '{idMetodeBayar}', '{idDiskon}', 1, '2020-12-12')")
+    
+    return redirect('view_pemesanan')
+    # return homepage(request=request)
