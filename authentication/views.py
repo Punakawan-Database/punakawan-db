@@ -18,6 +18,18 @@ def register_pelanggan(request):
             nohp = request.POST.get('phone')
             tgllahir = parse_date(request.POST.get('dob'))  # parse date
             alamat = request.POST.get('address')
+            
+            # validasi input
+            if not (nama and password and jeniskelamin and nohp and tgllahir and alamat):
+                messages.error(request, "Semua field perlu diisi.")
+                return redirect('register_pelanggan')
+            
+            # cek apakah nohp sudah teregister sebelumnya
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM pengguna WHERE nohp = %s", [nohp])
+                if cursor.fetchone()[0] > 0:
+                    messages.error(request, "Nomor handphone sudah terdaftar. Gunakan nomor lain.")
+                    return redirect('register_pelanggan') 
 
             # generate UUID
             user_id = str(uuid.uuid4())
@@ -62,8 +74,15 @@ def register_pekerja(request):
 
             # validasi input
             if not (nama and password and jeniskelamin and nohp and tgllahir and alamat and namabank and nomorrekening):
-                messages.error(request, "All fields marked with * are required.")
+                messages.error(request, "Semua field perlu diisi.")
                 return redirect('register_pekerja')
+            
+            # cek apakah nohp sudah teregister sebelumnya
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM pengguna WHERE nohp = %s", [nohp])
+                if cursor.fetchone()[0] > 0:
+                    messages.error(request, "Nomor handphone sudah terdaftar. Gunakan nomor lain.")
+                    return redirect('register_pekerja') 
 
             # generate UUID
             user_id = str(uuid.uuid4())
@@ -232,6 +251,16 @@ def profile_pekerja(request):
         else:
             namabank = nomorrekening = npwp = linkfoto = rating = jmlpesananselesai = None
 
+        # fetch kategori jasa pekerja
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT kj.namakategori
+                FROM pekerja_kategori_jasa pkj
+                JOIN kategori_jasa kj ON pkj.kategorijasaid = kj.id
+                WHERE pkj.pekerjaid = %s
+            """, [user_id])
+            kategori_jasa = [row[0] for row in cursor.fetchall()]  # List of `namakategori`
+
         # context
         context = {
             'nama': nama,
@@ -246,6 +275,7 @@ def profile_pekerja(request):
             'linkfoto': linkfoto,
             'rating': rating,
             'jmlpesananselesai': jmlpesananselesai,
+            'kategori_jasa': kategori_jasa,
         }
 
         return render(request, 'profile_pekerja.html', context)
