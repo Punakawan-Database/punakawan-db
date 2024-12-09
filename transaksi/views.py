@@ -1,7 +1,8 @@
+import pprint
 import uuid
 
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
@@ -139,11 +140,13 @@ def mypay_transaksi(request):
         jasa_results = db.query_all(
             """
             SELECT
-                skj.id AS id,
+                tpj.id AS id,
                 skj.namasubkategori AS nama,
                 tpj.tglpemesanan AS tgl,
                 tpj.totalbiaya AS total_biaya
             FROM TR_PEMESANAN_JASA tpj
+                JOIN METODE_BAYAR mb
+                    ON mb.id = tpj.idmetodebayar
                 JOIN PELANGGAN pl
                     ON pl.id = tpj.idpelanggan
                 JOIN SESI_LAYANAN sl
@@ -165,6 +168,7 @@ def mypay_transaksi(request):
                     AND tps_latest.tglwaktu = tps.tglwaktu
             WHERE
                 sp.status = 'Menunggu Pembayaran'
+                AND mb.nama = 'MyPay'
                 AND pl.id = %s
             """,
             [curr_user["id"]],
@@ -245,26 +249,83 @@ def mypay_transaksi_bayar(request):
     order_id = request.POST.get("jasa_id")
     harga = request.POST.get("harga")
 
-    # Update user balance
-    db.query_one(
+    if not order_id:
+        return HttpResponseBadRequest("id pemesanan tidak ada")
+
+    if not harga:
+        return HttpResponseBadRequest("harga pemesanan tidak ada")
+
+    # Convert to float and validate
+    try:
+        harga = float(harga)
+    except ValueError:
+        messages.error(request, "nominal topup harus berupa angka")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Check current balance
+    current_balance = db.query_one(
+        """
+        SELECT saldomypay
+        FROM PENGGUNA
+        WHERE id = %s
+        """,
+        [curr_user["id"]],
+    )
+
+    # TODO: Proses diskon kalau ada
+
+    if not current_balance or current_balance["saldomypay"] < harga:
+        messages.error(request, "saldo tidak mencukupi")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Log transaction
+    payment = db.query_one(
+        """
+        INSERT INTO TR_MYPAY (id, userid, tgl, nominal, kategoriid)
+        VALUES (%s, %s, NOW(), %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Pembayaran Jasa'))
+        RETURNING *
+        """,
+        [uuid.uuid4(), curr_user["id"], harga],
+    )
+
+    if not payment:
+        messages.error(request, "gagal mencatat pembayaran")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Update balance
+    updated_user = db.query_one(
         """
         UPDATE PENGGUNA
         SET saldomypay = saldomypay - %s
         WHERE id = %s
+        RETURNING *
         """,
         [harga, curr_user["id"]],
     )
 
-    # Log transaction
-    db.query_one(
+    if not updated_user:
+        messages.error(request, "gagal membayar pesanan")
+        return redirect("transaksi:mypay_transaksi")
+
+    # FIXME: Masih problem ga ke update status pesananya
+
+    # Insert order status - Menunggu Pekerja
+    status_update = db.query_one(
         """
-        INSERT INTO TR_MYPAY
-        (userid, nominal, kategoriid, tgl)
-        VALUES
-        (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Pembayaran Jasa'), NOW())
+        INSERT INTO TR_PEMESANAN_STATUS (idtrpemesanan, idstatus, tglwaktu)
+        VALUES (
+            %s,
+            (SELECT id FROM STATUS_PESANAN WHERE status = 'Mencari Pekerja Terdekat'),
+            NOW()
+        )
+        RETURNING *
         """,
-        [curr_user["id"], harga],
+        [order_id],
     )
+
+    if not status_update:
+        messages.error(request, "gagal memperbarui status pesanan")
+        return redirect("transaksi:mypay_transaksi")
 
     return redirect("transaksi:mypay")
 
