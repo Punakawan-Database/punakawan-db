@@ -35,8 +35,8 @@
                         <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-200">
                             <div class="grid grid-cols-3 gap-4">
                                 <div>
-                                    <span class="{% if tr.kategori == 'TopUp MyPay' %}text-green-600{% else %}text-red-600{% endif %} font-semibold text-lg">
-                                        {% if tr.kategori == 'TopUp MyPay' %}
+                                    <span class="{% if tr.is_pemasukan %}text-green-600{% else %}text-red-600{% endif %} font-semibold text-lg">
+                                        {% if tr.is_pemasukan %}
                                             +
                                         {% else %}
                                             -

@@ -1,5 +1,6 @@
-from django import template
 import locale
+
+from django import template
 
 try:
     locale.setlocale(locale.LC_ALL, "id_ID.UTF-8")
