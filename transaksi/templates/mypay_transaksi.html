@@ -7,6 +7,16 @@
                 <h1 class="text-4xl font-bold mb-2">Transaction Form</h1>
                 <p class="text-xl">Choose your transaction type</p>
             </div>
+            <!-- Messages Section -->
+            {% if messages %}
+                <div class="mb-8">
+                    {% for message in messages %}
+                        <div class="bg-white rounded-lg shadow-lg p-4 {% if message.tags == 'success' %}border-l-4 border-green-500{% else %}border-l-4 border-red-500{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <!-- Main Form Card -->
             <div class="bg-white rounded-lg shadow-lg p-8">
                 <!-- User Info Section -->
@@ -38,14 +48,14 @@
                 <div id="stateForms">
                     <!-- State 1: Top Up -->
                     <div id="topupForm" class="hidden state-form">
-                        <form method="post">
+                        <form method="post" action="{% url 'transaksi:mypay_transaksi_topup' %}">
                             {% csrf_token %}
-                            <input type="hidden" name="form_type" value="topup">
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-gray-600 mb-2 text-lg">Nominal</label>
                                     <input type="number"
                                            name="nominal"
+                                           required
                                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                                 </div>
                                 <button type="submit"
@@ -58,9 +68,8 @@
                     <!-- State 2: Service Order -->
                     {% if user.role == "pelanggan" %}
                         <div id="serviceForm" class="hidden state-form">
-                            <form method="post">
+                            <form method="post" action="{% url 'transaksi:mypay_transaksi_bayar' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="form_type" value="service">
                                 <div class="space-y-4">
                                     <div class="grid grid-cols-2 gap-4">
                                         <select id="jasa-dropdown"
@@ -89,9 +98,8 @@
                     {% endif %}
                     <!-- State 3: Transfer -->
                     <div id="transferForm" class="hidden state-form">
-                        <form method="post">
+                        <form method="post" action="{% url 'transaksi:mypay_transaksi_transfer' %}">
                             {% csrf_token %}
-                            <input type="hidden" name="form_type" value="transfer">
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-gray-600 mb-2 text-lg">No HP</label>
@@ -114,14 +122,13 @@
                     </div>
                     <!-- State 4: Bank Withdrawal -->
                     <div id="withdrawalForm" class="hidden state-form">
-                        <form method="post">
+                        <form method="post" action="{% url 'transaksi:mypay_transaksi_withdraw' %}">
                             {% csrf_token %}
-                            <input type="hidden" name="form_type" value="withdrawal">
                             <div class="space-y-4">
                                 <select name="bank_id"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                                     <option value="">Pilih Bank</option>
-                                    {% for bn in bank %}<option value="{{ bn.id }}">{{ bn.nama }}</option>{% endfor %}
+                                    {% for bn in bank %}<option value="{{ bn }}">{{ bn }}</option>{% endfor %}
                                 </select>
                                 <div>
                                     <label class="block text-gray-600 mb-2 text-lg">No Rekening</label>

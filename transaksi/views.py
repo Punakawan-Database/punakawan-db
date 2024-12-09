@@ -1,5 +1,9 @@
+import uuid
+
+from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
 from utils import db
 
@@ -10,7 +14,7 @@ from utils import db
 # }
 
 logged_user = {
-    "id": "d02eee9e-83a4-4e42-9ffe-3defcab6d447",
+    "id": "c805f812-a271-4ad1-b063-901bb0bc9bfe",
     "role": "pelanggan",
     "nama": "Jono Doe",
 }
@@ -150,6 +154,15 @@ def mypay_transaksi(request):
                     ON tps.idtrpemesanan = tpj.id
                 JOIN STATUS_PESANAN sp
                     ON sp.id = tps.idstatus
+                JOIN (
+                    SELECT
+                        idtrpemesanan,
+                        MAX(tglwaktu) AS tglwaktu
+                    FROM TR_PEMESANAN_STATUS
+                    GROUP BY idtrpemesanan
+                ) tps_latest
+                    ON tps_latest.idtrpemesanan = tps.idtrpemesanan
+                    AND tps_latest.tglwaktu = tps.tglwaktu
             WHERE
                 sp.status = 'Menunggu Pembayaran'
                 AND pl.id = %s
@@ -165,6 +178,180 @@ def mypay_transaksi(request):
                 "saldo": user_result["saldo"],
             },
             "jasa": jasa_results,
+            "bank": ["BCA", "BNI", "BRI", "Mandiri", "Bank Jateng"],
         }
 
     return render(request, "mypay_transaksi.html", context)
+
+
+@require_POST
+def mypay_transaksi_topup(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    # Get and validate nominal
+    nominal = request.POST.get("nominal")
+    if not nominal:
+        messages.error(request, "nominal topup harus diisi")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Convert to float and validate
+    try:
+        nominal = float(nominal)
+    except ValueError:
+        messages.error(request, "nominal topup harus berupa angka")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Business rules validation
+    if nominal <= 0:
+        messages.error(request, "nominal topup harus lebih dari 0")
+        return redirect("transaksi:mypay_transaksi")
+
+    user_transaction = db.query_one(
+        """
+        INSERT INTO TR_MYPAY (id, userid, tgl, nominal, kategoriid)
+        VALUES (%s, %s, NOW(), %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Topup'))
+        RETURNING *
+        """,
+        [uuid.uuid4(), curr_user["id"], nominal],
+    )
+
+    if not user_transaction:
+        messages.error(request, "gagal melakukan top up: transaksi tidak tercatat")
+        return redirect("transaksi:mypay_transaksi")
+
+    updated_user = db.query_one(
+        """
+        UPDATE PENGGUNA
+        SET saldomypay = saldomypay + %s
+        WHERE id = %s
+        RETURNING *
+        """,
+        [nominal, curr_user["id"]],
+    )
+
+    if not updated_user:
+        messages.error(request, "Gagal memperbarui saldo")
+        return redirect("transaksi:mypay_transaksi")
+
+    return redirect("transaksi:mypay")
+
+
+@require_POST
+def mypay_transaksi_bayar(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    order_id = request.POST.get("jasa_id")
+    harga = request.POST.get("harga")
+
+    # Update user balance
+    db.query_one(
+        """
+        UPDATE PENGGUNA
+        SET saldomypay = saldomypay - %s
+        WHERE id = %s
+        """,
+        [harga, curr_user["id"]],
+    )
+
+    # Log transaction
+    db.query_one(
+        """
+        INSERT INTO TR_MYPAY
+        (userid, nominal, kategoriid, tgl)
+        VALUES
+        (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Pembayaran Jasa'), NOW())
+        """,
+        [curr_user["id"], harga],
+    )
+
+    return redirect("transaksi:mypay")
+
+
+@require_POST
+def mypay_transaksi_transfer(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    no_hp = request.POST.get("no_hp")
+    nominal = request.POST.get("nominal")
+
+    # Get target user
+    target_user = db.query_one(
+        """
+        SELECT p.id
+        FROM PENGGUNA p
+        WHERE p.nohp = %s"
+        """,
+        [no_hp],
+    )
+
+    # Update riwayat transaksi sender
+    db.query_one(
+        """
+        INSERT INTO TR_MYPAY (userid, nominal, kategoriid, tgl)
+        VALUES (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Transfer'), NOW())
+        """,
+        [curr_user["id"], nominal],
+    )
+
+    # Update riwayat transaksi receiver
+    db.query_one(
+        """
+        INSERT INTO TR_MYPAY (userid, nominal, kategoriid, tgl)
+        VALUES (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Transfer'), NOW())
+        """,
+        [curr_user["id"], nominal],
+    )
+
+    # Update saldo sender
+    db.query_one(
+        """
+        UPDATE PENGGUNA p
+        SET p.saldomypay = p.saldomypay - %s
+        WHERE p.id = %s
+        """,
+        [nominal, curr_user["id"]],
+    )
+
+    # Update saldo receiver
+    db.query_one(
+        """
+        UPDATE PENGGUNA p
+        SET p.saldomypay = p.saldomypay + %s
+        WHERE p.id = %s
+        """,
+        [nominal, curr_user["id"]],
+    )
+
+    return redirect("transaksi:mypay")
+
+
+@require_POST
+def mypay_transaksi_withdraw(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    nominal = request.POST.get("nominal")
+
+    # Log transaction
+    db.query_one(
+        """
+        INSERT INTO TR_MYPAY (userid, nominal, kategoriid, tgl)
+        VALUES (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Withdrawal'), NOW())
+        """,
+        [curr_user["id"], nominal],
+    )
+
+    # Update balance
+    db.query_one(
+        """
+        UPDATE PENGGUNA
+        SET saldomypay = saldomypay - %s
+        WHERE id = %s"
+        """,
+        [nominal, curr_user["id"]],
+    )
+
+    return redirect("transaksi:mypay")
