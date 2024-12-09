@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.http import HttpResponseBadRequest, HttpResponseServerError
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
 from utils import db
 
@@ -64,8 +67,9 @@ def pekerjaan_jasa(request):
         SELECT
             skj.namasubkategori AS subkategori,
             ppl.nama AS nama_pelanggan,
+            tpj.id AS id_transaksi,
             tpj.tglpemesanan AS tanggal_pemesanan,
-            tpj.tglpekerjaan AS tanggal_pekerjaan,
+            tpj.sesi AS sesi,
             tpj.totalbiaya AS total_biaya
         FROM TR_PEMESANAN_JASA tpj
             JOIN PELANGGAN pl
@@ -83,6 +87,15 @@ def pekerjaan_jasa(request):
                 ON tps.idtrpemesanan = tpj.id
             JOIN STATUS_PESANAN sp
                 ON sp.id = tps.idstatus
+            JOIN (
+                SELECT
+                    idtrpemesanan,
+                    MAX(tglwaktu) AS tglwaktu
+                FROM TR_PEMESANAN_STATUS
+                GROUP BY idtrpemesanan
+            ) tps_latest
+                ON tps_latest.idtrpemesanan = tps.idtrpemesanan
+                AND tps_latest.tglwaktu = tps.tglwaktu
         WHERE
             sp.status = 'Mencari Pekerja Terdekat'
             AND skj.id IN (
@@ -129,6 +142,55 @@ def pekerjaan_jasa(request):
     return render(request, "pekerjaan_jasa.html", context)
 
 
+@require_POST
+# TODO: Better error handling
+def pekerjaan_jasa_update(request):
+    curr_user = logged_user
+    # curr_user = request.session.get("user")
+
+    order_id = request.POST.get("order_id")
+    if not order_id:
+        return HttpResponseBadRequest("order_id kosong")
+
+    status_result = db.query_one(
+        """
+        SELECT sp.id FROM STATUS_PESANAN sp
+        WHERE sp.status = 'Menunggu Pekerja Berangkat'
+        """
+    )
+
+    if not status_result:
+        return HttpResponseServerError("status 'Menunggu Pekerja Berangkat' tidak ditemukan")
+
+    updated_order = db.query_one(
+        """
+        INSERT INTO TR_PEMESANAN_STATUS
+        (idtrpemesanan, idstatus, tglwaktu)
+        VALUES (%s, %s, NOW())
+        RETURNING *
+        """,
+        [order_id, status_result["id"]],
+    )
+
+    updated_transaksi = db.query_one(
+        """
+        UPDATE TR_PEMESANAN_JASA
+        SET idpekerja = %s,
+            tglpekerjaan = CURRENT_DATE,
+            waktupekerjaan = CURRENT_DATE + interval '1 day' * sesi
+        WHERE id_tr_pemesanan_jasa = %s
+        """,
+        [curr_user["id"], order_id],
+    )
+
+    if updated_order and updated_transaksi:
+        messages.success(request, "status pesanan berhasil diperbarui")
+    else:
+        messages.error(request, "gagal memperbarui status pesanan")
+
+    return redirect("pekerjaan_jasa:pekerjaan_jasa")
+
+
 def pekerjaan_jasa_status(request):
     curr_user = logged_user
     # curr_user = request.session.get("user")
@@ -157,10 +219,24 @@ def pekerjaan_jasa_status(request):
         SELECT
             skj.namasubkategori AS subkategori,
             ppl.nama AS nama_pelanggan,
+            tpj.id AS id_transaksi,
             tpj.tglpemesanan AS tanggal_pemesanan,
-            tpj.tglpekerjaan AS tanggal_pekerjaan,
+            tpj.sesi AS sesi,
             tpj.totalbiaya AS total_biaya,
             sp.status AS status_pesanan,
+            CASE sp.status
+                WHEN 'Menunggu Pekerja Berangkat' THEN (
+                    SELECT id FROM STATUS_PESANAN WHERE status = 'Pekerja Tiba di Lokasi'
+                )
+                WHEN 'Pekerja Tiba di Lokasi' THEN (
+                    SELECT id FROM STATUS_PESANAN WHERE status = 'Pelayanan Jasa Sedang Dilakukan'
+                )
+                WHEN 'Pelayanan Jasa Sedang Dilakukan' THEN (
+                    SELECT id FROM STATUS_PESANAN WHERE status = 'Pesanan Selesai'
+                )
+                WHEN 'Pesanan Selesai' THEN NULL
+                WHEN 'Pesanan Dibatalkan' THEN NULL
+            END AS next_status_id,
             CASE sp.status
                 WHEN 'Menunggu Pekerja Berangkat' THEN 'Pekerja Tiba di Lokasi'
                 WHEN 'Pekerja Tiba di Lokasi' THEN 'Pelayanan Jasa Sedang Dilakukan'
@@ -186,6 +262,15 @@ def pekerjaan_jasa_status(request):
                 ON tps.idtrpemesanan = tpj.id
             JOIN STATUS_PESANAN sp
                 ON sp.id = tps.idstatus
+            JOIN (
+                SELECT
+                    idtrpemesanan,
+                    MAX(tglwaktu) AS tglwaktu
+                FROM TR_PEMESANAN_STATUS
+                GROUP BY idtrpemesanan
+            ) tps_latest
+                ON tps_latest.idtrpemesanan = tps.idtrpemesanan
+                AND tps_latest.tglwaktu = tps.tglwaktu
         WHERE
             sp.status IN (
                 'Menunggu Pekerja Berangkat',
@@ -219,3 +304,30 @@ def pekerjaan_jasa_status(request):
     }
 
     return render(request, "pekerjaan_jasa_status.html", context)
+
+
+@require_POST
+# TODO: Better error handling
+def pekerjaan_jasa_status_update(request):
+    order_id = request.POST.get("order_id")
+    status_id = request.POST.get("status_id")
+
+    if not order_id or not status_id:
+        return HttpResponseBadRequest("data request tidak lengkap")
+
+    updated_order = db.query_one(
+        """
+        INSERT INTO TR_PEMESANAN_STATUS
+        (idtrpemesanan, idstatus, tglwaktu)
+        VALUES (%s, %s, NOW())
+        RETURNING *
+        """,
+        [order_id, status_id],
+    )
+
+    if updated_order:
+        messages.success(request, "status pesanan berhasil diperbarui")
+    else:
+        messages.error(request, "gagal memperbarui status pesanan")
+
+    return redirect("pekerjaan_jasa:pekerjaan_jasa_status")

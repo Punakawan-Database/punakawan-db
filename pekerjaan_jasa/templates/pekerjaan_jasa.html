@@ -41,6 +41,16 @@
                     </button>
                 </form>
             </div>
+            <!-- Messages Section -->
+            {% if messages %}
+                <div class="mb-8">
+                    {% for message in messages %}
+                        <div class="bg-white rounded-lg shadow-lg p-4 {% if message.tags == 'success' %}border-l-4 border-green-500{% else %}border-l-4 border-red-500{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <!-- Service Orders List -->
             <div class="space-y-6">
                 {% for ps in pesanan %}
@@ -62,19 +72,25 @@
                                     <div class="font-medium text-lg">{{ ps.tanggal_pemesanan }}</div>
                                 </div>
                                 <div>
-                                    <div class="text-gray-600 mb-1">Tanggal Pekerjaan</div>
-                                    <div class="font-medium text-lg">{{ ps.tanggal_pekerjaan }}</div>
+                                    <div class="text-gray-600 mb-1">Sesi Pekerjaan</div>
+                                    <div class="font-medium text-lg">{{ ps.sesi }} Hari</div>
                                 </div>
                             </div>
-                            <div class="flex flex-col md:items-end justify-between">
+                            <!-- Form section -->
+                            <form method="post"
+                                  action="{% url 'pekerjaan_jasa:pekerjaan_jasa_update' %}"
+                                  class="flex flex-col md:items-end justify-between">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ ps.id_transaksi }}">
                                 <div>
                                     <div class="text-gray-600 mb-1">Total Biaya</div>
                                     <div class="text-2xl font-semibold text-blue-600">Rp {{ ps.total_biaya }}</div>
                                 </div>
-                                <button class="w-full md:w-auto mt-4 md:mt-0 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium whitespace-nowrap flex-shrink-0">
+                                <button type="submit"
+                                        class="w-full md:w-auto mt-4 md:mt-0 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium whitespace-nowrap flex-shrink-0">
                                     Kerjakan Pesanan
                                 </button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 {% endfor %}
@@ -82,32 +98,29 @@
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const categorySelect = document.querySelector('.select-kategori');
-            const subcategorySelect = document.querySelector('.select-subkategori');
-            const filterButton = document.querySelector('.filter-button');
+        const categorySelect = document.querySelector('.select-kategori');
+        const subcategorySelect = document.querySelector('.select-subkategori');
 
-            const allSubcategoryOptions = subcategorySelect.querySelectorAll('option:not(:first-child)');
-    
-            allSubcategoryOptions.forEach(option => {
-                option.style.display = '';
-            });
+        const allSubcategoryOptions = subcategorySelect.querySelectorAll('option:not(:first-child)');
 
-            // Category change handler
-            categorySelect.addEventListener('change', (e) => {
-                const selectedCategory = e.target.value;
-                subcategorySelect.value = '';
-                
-                if (selectedCategory === '') {
-                    allSubcategoryOptions.forEach(option => {
-                        option.style.display = '';
-                    });
-                } else {
-                    allSubcategoryOptions.forEach(option => {
-                        option.style.display = option.dataset.kategori === selectedCategory ? '' : 'none';
-                    });
-                }
-            });
+        allSubcategoryOptions.forEach(option => {
+            option.style.display = '';
+        });
+
+        // Category change handler
+        categorySelect.addEventListener('change', (e) => {
+            const selectedCategory = e.target.value;
+            subcategorySelect.value = '';
+            
+            if (selectedCategory === '') {
+                allSubcategoryOptions.forEach(option => {
+                    option.style.display = '';
+                });
+            } else {
+                allSubcategoryOptions.forEach(option => {
+                    option.style.display = option.dataset.kategori === selectedCategory ? '' : 'none';
+                });
+            }
         });
     </script>
 {% endblock content %}
