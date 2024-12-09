@@ -51,19 +51,19 @@
                     <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.potongan }}</p>
                 </div>
                 <div class="col-span-1">
-                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.min_transaksi }}</p>
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.mintrpemesanan}}</p>
                 </div>
                 <div class="col-span-1">
-                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.jumlah_hari }}</p>
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.jmlhariberlaku }}</p>
                 </div>
                 <div class="col-span-1">
-                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.kuota }}</p>
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.kuotapenggunaan }}</p>
                 </div>
                 <div class="col-span-1">
                     <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ voucher.harga }}</p>
                 </div>
                 <div class="col-span-1">
-                    <button onclick="popup('{{ voucher.kode }}', '{{ voucher.jumlah_hari }}', '{{ voucher.kuota }}', '{{ voucher.harga }}')" 
+                    <button onclick="popup('{{ voucher.kode }}', '{{ voucher.jmlhariberlaku }}', '{{ voucher.kuotapenggunaan }}', '{{ voucher.harga }}')" 
                             class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
                         Beli
                     </button>
@@ -93,7 +93,7 @@
                     <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ promo.kode }}</p>
                 </div>
                 <div class="col-span-4">
-                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ promo.tanggal_akhir }}</p>
+                    <p class="w-full px-3 py-2 border rounded-md text-center text-gray-500">{{ promo.tglakhirberlaku|date:"d F Y" }}</p>
                 </div>
             </div>
             {% endfor %}
@@ -108,7 +108,7 @@
     // temporary script for front-end
     function popup(kode, jumlah_hari, kuota, harga) {
         const tanggal_akhir = new Date();
-        tanggal_akhir.setDate(tanggal_akhir.getDate() + jumlah_hari);
+        tanggal_akhir.setDate(tanggal_akhir.getDate() + parseInt(jumlah_hari));
 
         const day = tanggal_akhir.getDate();
         const month = tanggal_akhir.getMonth() + 1;

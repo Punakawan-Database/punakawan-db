@@ -36,10 +36,14 @@ def homepage(request, kategori = None, subkategori = None):
                 j['subcategories'].append(i)
                 
 
-    categories = fetch_categories
-    
-    
-    # global categories
+categories = fetch_categories
+
+testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
+print(testimoni[0])
+
+# print(categories)
+def homepage(request, kategori = None, subkategori = None):
+    global categories
     # user = get_user(request)
     userID = request.session.get('user_id')
     # print(userID + " FFF")
@@ -183,24 +187,25 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
     
     # print(selected_category)
     
-    selected_testimoni = []
-    testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
-    for x in testimoni:
-        if str(x['idkategorijasa']) == str(subkategori_slug):
-            selected_testimoni.append(x)
+    # selected_testimoni = []
+    # for x in testimoni:
+    #     if str(x['idkategorijasa']) == str(subkategori_slug):
+    #         selected_testimoni.append(x)
     
-    pengguna = db.query_all("SELECT * from PENGGUNA")
-    
-    # print(selected_testimoni)
-    for j in pengguna:
-        for x in selected_testimoni:
-            if (str(x['idpelanggan'])) == str(j['id']):
-                x['nama_pelanggan'] = str(j['nama'])
+    # for j in pengguna:
+    #     for x in selected_testimoni:
+    #         if (str(x['idpelanggan'])) == str(j['id']):
+    #             x['nama_pelanggan'] = str(j['nama'])
                 
-    for j in pengguna:
-        for x in selected_testimoni:
-            if (str(x['idpekerja'])) == str(j['id']):
-                x['worker_name'] = str(j['nama'])
+    # for j in pengguna:
+    #     for x in selected_testimoni:
+    #         if (str(x['idpekerja'])) == str(j['id']):
+    #             x['worker_name'] = str(j['nama'])
+    selected_testimoni = db.query_all(
+        "SELECT * FROM TESTIMONI, TR_PEMESANAN_JASA \
+        where TR_PEMESANAN_JASA.id = TESTIMONI.idtrpemesanan \
+        and TR_PEMESANAN_JASA.idkategorijasa = '"+subkategori_slug+"'"
+    )
                 
                 
                 
@@ -348,32 +353,28 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
                 workers_lengkap.append(x)
     
     
-    selected_testimoni = []
-    testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
-    for x in testimoni:
-        if str(x['idkategorijasa']) == str(subkategori_slug):
-            selected_testimoni.append(x)
+    # selected_testimoni = []
+    # for x in testimoni:
+    #     if str(x['idkategorijasa']) == str(subkategori_slug):
+    #         selected_testimoni.append(x)
     
-    # print(selected_testimoni)
-    for j in pengguna:
-        for x in selected_testimoni:
-            if (str(x['idpelanggan'])) == str(j['id']):
-                x['nama_pelanggan'] = str(j['nama'])
+    # # print(selected_testimoni)
+    # for j in pengguna:
+    #     for x in selected_testimoni:
+    #         if (str(x['idpelanggan'])) == str(j['id']):
+    #             x['nama_pelanggan'] = str(j['nama'])
                 
-    for j in pengguna:
-        for x in selected_testimoni:
-            if (str(x['idpekerja'])) == str(j['id']):
-                x['worker_name'] = str(j['nama'])
+    # for j in pengguna:
+    #     for x in selected_testimoni:
+    #         if (str(x['idpekerja'])) == str(j['id']):
+    #             x['worker_name'] = str(j['nama'])
+    selected_testimoni = db.query_all(
+    "SELECT * FROM TESTIMONI, TR_PEMESANAN_JASA, \
+    where TR_PEMESANAN_JASA.id = TESTIMONI.idtrpemesanan \
+    and TR_PEMESANAN_JASA.idkategorijasa = '"+subkategori_slug+"'"
+    )
 
-    # print(selected_testimoni)
-    # print(workers_lengkap)
-    
-    gaAdaButton = False
-    for x in workers_lengkap:
-        if str(x['id']) == str(userID):
-            # print("KONTSSS")
-            gaAdaButton = True
-            break
+    print(selected_testimoni)
     context = {
         'category_slug' : str(kategori_slug),
         'selected_category' : selected_category[0],
