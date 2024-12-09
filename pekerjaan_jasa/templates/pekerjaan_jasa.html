@@ -9,43 +9,52 @@
             </div>
             <!-- Filter Section -->
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-                <div class="flex flex-wrap gap-4 items-center">
+                <form method="get" class="flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[16rem]">
-                        <select class="select-kategori w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                        <select name="kategori"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                             <option value="">Pilih Kategori</option>
-                            <option value="HC">Home Cleaning</option>
-                            <option value="DC">Deep Cleaning</option>
-                            <option value="SA">Service AC</option>
-                            <option value="ME">Message</option>
-                            <option value="HI">Hair Care</option>
+                            {% for kt in kategori %}
+                                <option value="{{ kt.id_kategori }}"
+                                        {% if request.GET.kategori == kt.id_kategori|stringformat:"s" %}selected{% endif %}>
+                                    {{ kt.nama_kategori }}
+                                </option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="flex-1 min-w-[16rem]">
-                        <select class="select-subkategori w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                        <select name="subkategori"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
                             <option value="">Pilih Subkategori</option>
-                            <!-- Home Cleaning Subkategori -->
-                            <option value="HC01">Daily Cleaning</option>
-                            <option value="HC02">Setrika</option>
-                            <option value="HC03">Pembersihan dapur dan kulkas</option>
-                            <option value="HC04">Kombo daily cleaning + setrika</option>
-                            <option value="HC05">Kombo daily cleaning + dapur</option>
-                            <!-- Deep Cleaning Subkategori -->
-                            <option value="DC01">Cuci Kasur</option>
-                            <option value="DC02">Cuci Sofa</option>
-                            <option value="DC03">Cuci Karpet</option>
-                            <option value="DC04">Cuci Tirai</option>
-                            <option value="DC05">Bersih kamar mandi</option>
+                            {% for skt in subkategori %}
+                                <option value="{{ skt.id_subkategori }}"
+                                        data-kategori="{{ skt.id_kategori }}"
+                                        {% if request.GET.subkategori == skt.id_subkategori|stringformat:"s" %}selected{% endif %}>
+                                    {{ skt.nama_subkategori }}
+                                </option>
+                            {% endfor %}
                         </select>
                     </div>
-                    <button class="filter-button bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium flex-shrink-0">
+                    <button type="submit"
+                            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-medium flex-shrink-0">
                         Cari
                     </button>
-                </div>
+                </form>
             </div>
+            <!-- Messages Section -->
+            {% if messages %}
+                <div class="mb-8">
+                    {% for message in messages %}
+                        <div class="bg-white rounded-lg shadow-lg p-4 {% if message.tags == 'success' %}border-l-4 border-green-500{% else %}border-l-4 border-red-500{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <!-- Service Orders List -->
             <div class="space-y-6">
                 {% for ps in pesanan %}
-                    <div class="order-card bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-200">
+                    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition duration-200">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="space-y-4">
                                 <div>
@@ -63,19 +72,25 @@
                                     <div class="font-medium text-lg">{{ ps.tanggal_pemesanan }}</div>
                                 </div>
                                 <div>
-                                    <div class="text-gray-600 mb-1">Tanggal Pekerjaan</div>
-                                    <div class="font-medium text-lg">{{ ps.tanggal_pekerjaan }}</div>
+                                    <div class="text-gray-600 mb-1">Sesi Pekerjaan</div>
+                                    <div class="font-medium text-lg">{{ ps.sesi }} Hari</div>
                                 </div>
                             </div>
-                            <div class="flex flex-col md:items-end justify-between">
+                            <!-- Form section -->
+                            <form method="post"
+                                  action="{% url 'pekerjaan_jasa:pekerjaan_jasa_update' %}"
+                                  class="flex flex-col md:items-end justify-between">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ ps.id_transaksi }}">
                                 <div>
                                     <div class="text-gray-600 mb-1">Total Biaya</div>
                                     <div class="text-2xl font-semibold text-blue-600">Rp {{ ps.total_biaya }}</div>
                                 </div>
-                                <button class="w-full md:w-auto mt-4 md:mt-0 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium whitespace-nowrap flex-shrink-0">
+                                <button type="submit"
+                                        class="w-full md:w-auto mt-4 md:mt-0 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium whitespace-nowrap flex-shrink-0">
                                     Kerjakan Pesanan
                                 </button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 {% endfor %}
@@ -83,72 +98,29 @@
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const categorySelect = document.querySelector('.select-kategori');
-            const subcategorySelect = document.querySelector('.select-subkategori');
-            const filterButton = document.querySelector('.filter-button');
-            const orderCards = document.querySelectorAll('.order-card');
+        const categorySelect = document.querySelector('.select-kategori');
+        const subcategorySelect = document.querySelector('.select-subkategori');
+
+        const allSubcategoryOptions = subcategorySelect.querySelectorAll('option:not(:first-child)');
+
+        allSubcategoryOptions.forEach(option => {
+            option.style.display = '';
+        });
+
+        // Category change handler
+        categorySelect.addEventListener('change', (e) => {
+            const selectedCategory = e.target.value;
+            subcategorySelect.value = '';
             
-            const subcategoriesMap = {
-                'HC': ['HC01', 'HC02', 'HC03', 'HC04', 'HC05'],
-                'DC': ['DC01', 'DC02', 'DC03', 'DC04', 'DC05'],
-                'SA': [],
-                'ME': [],
-                'HI': []
-            };
-
-            const allSubcategoryOptions = subcategorySelect.querySelectorAll('option:not(:first-child)');
-    
-            allSubcategoryOptions.forEach(option => {
-                option.style.display = '';
-            });
-
-            // Category change handler
-            categorySelect.addEventListener('change', (e) => {
-                const selectedCategory = e.target.value;
-                subcategorySelect.value = '';
-                
-                if (selectedCategory === '') {
-                    allSubcategoryOptions.forEach(option => {
-                        option.style.display = '';
-                    });
-                } else {
-                    const relevantSubcategories = subcategoriesMap[selectedCategory];
-                    allSubcategoryOptions.forEach(option => {
-                        option.style.display = relevantSubcategories.includes(option.value) ? '' : 'none';
-                    });
-                }
-            });
-    
-            // Filter button click handler
-            filterButton.addEventListener('click', () => {
-                const selectedCategory = categorySelect.value;
-                const selectedSubcategory = subcategorySelect.value;
-    
-                orderCards.forEach(card => {
-                    const subkategori = card.querySelector('.font-medium').textContent.trim();
-                    
-                    // If no filters selected, show all cards
-                    if (!selectedCategory && !selectedSubcategory) {
-                        card.style.display = 'block';
-                        return;
-                    }
-    
-                    // Get subcategory ID based on name
-                    const subcategoryId = Object.entries(subcategoriesMap)
-                        .flatMap(([category, subcategories]) => 
-                            subcategories.find(id => {
-                                const option = subcategorySelect.querySelector(`option[value="${id}"]`);
-                                return option && option.textContent === subkategori;
-                            })
-                        )[0];
-    
-                    const matchesCategory = !selectedCategory || subcategoryId?.startsWith(selectedCategory);
-                    const matchesSubcategory = !selectedSubcategory || subcategoryId === selectedSubcategory;
-    
-                    card.style.display = (matchesCategory && matchesSubcategory) ? 'block' : 'none';
-                })
-            })
+            if (selectedCategory === '') {
+                allSubcategoryOptions.forEach(option => {
+                    option.style.display = '';
+                });
+            } else {
+                allSubcategoryOptions.forEach(option => {
+                    option.style.display = option.dataset.kategori === selectedCategory ? '' : 'none';
+                });
+            }
         });
     </script>
 {% endblock content %}

@@ -1,9 +1,14 @@
-from django import template
 import locale
 
-locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')  # set idr format
+from django import template
+
+try:
+    locale.setlocale(locale.LC_ALL, "id_ID.UTF-8")
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, "C.UTF-8")
 
 register = template.Library()
+
 
 @register.filter
 def format_idr(value):
@@ -11,4 +16,4 @@ def format_idr(value):
         value = float(value)
         return locale.currency(value, grouping=True, symbol="Rp ")
     except (ValueError, TypeError):
-        return value 
+        return value
