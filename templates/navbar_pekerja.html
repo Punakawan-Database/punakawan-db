@@ -1,37 +1,41 @@
 {% load static %}
-<nav id="navbar" class="fixed top-0 left-0 z-50 w-full transition duration-300 ease-in-out bg-transparent backdrop-blur-md">
+<nav id="navbar"
+     class="fixed top-0 left-0 z-50 w-full transition duration-300 ease-in-out bg-transparent backdrop-blur-md">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Left side - Role -->
       <div class="flex items-center">
         <span class="text-white font-semibold mr-4">Role: Pekerja</span>
       </div>
-
       <!-- Center - Main Navigation -->
       <div id="navLinks" class="flex items-center space-x-6">
         <a href="{% url 'homepage' %}" class="nav-link">Homepage</a>
-        <a href="" class="nav-link">Kelola Pekerjaan</a>
-        <a href="" class="nav-link">Status Pekerjaan</a>
-        <a href="" class="nav-link">MyPay</a>
+        <a href="{% url 'pekerjaan_jasa:pekerjaan_jasa' %}" class="nav-link">Kelola Pekerjaan</a>
+        <a href="{% url 'pekerjaan_jasa:pekerjaan_jasa_status' %}"
+           class="nav-link">Status Pekerjaan</a>
+        <a href="{% url 'transaksi:mypay' %}" class="nav-link">MyPay</a>
       </div>
-
       <!-- Right side - Profile Dropdown -->
       <div class="relative">
         <button id="profileDropdown" class="nav-link flex items-center">
           <span class="mr-2">{{ user.username }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="h-4 w-4"
+               fill="none"
+               viewBox="0 0 24 24"
+               stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
-        <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-            <a href="{% url 'profile_pekerja' %}" class="dropdown-item">Profile</a>
-            <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+        <div id="dropdownMenu"
+             class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+          <a href="{% url 'profile_pekerja' %}" class="dropdown-item">Profile</a>
+          <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
         </div>
       </div>
     </div>
   </div>
 </nav>
-
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const profileDropdownButton = document.getElementById("profileDropdown");
@@ -70,7 +74,6 @@
     });
   });
 </script>
-
 <style>
   .nav-link {
     color: white;
