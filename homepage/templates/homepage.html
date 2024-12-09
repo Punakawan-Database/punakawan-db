@@ -29,7 +29,7 @@
                                     text-gray-700 appearance-none focus:outline-none 
                                     focus:border-blue-500 transition duration-300 
                                     bg-white pr-8 hover:border-blue-400">
-                        <option selected disabled hidden>Select Kategori</option>
+                        <option selected>Select Category (All)</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.namakategori }}</option>
                         {% endfor %}
@@ -68,8 +68,8 @@
 
         <!-- Categories Section with Card-like Design -->
         <div class="grid md:grid-cols-2 gap-8">
-            {% for category in categories %}
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden 
+            {% for category in selected_category %}
+                <div id = "list_kategori "class="bg-white rounded-2xl shadow-lg overflow-hidden 
                             transform transition-all hover:scale-[1.03] hover:shadow-2xl category"
                     data-category-slug="{{ category.id }}">
                     <div class="p-6">
@@ -79,7 +79,7 @@
                         <ol class="space-y-2">
                             {% for item in category.subcategories %}
                                 <li class="subcategory group"
-                                    data-subcategory-name="{{ item.name }}">
+                                    data-subcategory-name="{{ item.namasubkategori }}">
                                     {% if isPelanggan == True %}
                                         <a href="{% url 'subkategori_jasa' kategori_slug=category.id subkategori_slug=item.id %}" 
                                         class="text-blue-600 hover:text-blue-800 
@@ -119,30 +119,56 @@
 <script>
     document.getElementById("submit").addEventListener("click", function () {
         const selectedCategory = document.getElementById("Kategori").value;
-        const searchInput = document.getElementById("search_subkategori").value.toLowerCase();
-        const categories = document.querySelectorAll(".category");
+        let searchInput = document.getElementById("search_subkategori").value;
+        // const categories = document.querySelectorAll(".category");
+        // window.alert("FF"+searchInput+"AA");
 
-        categories.forEach(category => {
-            const categorySlug = category.getAttribute("data-category-slug");
-            const subcategories = category.querySelectorAll(".subcategory");
-            let categoryVisible = false;
+        // window.alert(categories);
 
-            if (!selectedCategory || categorySlug === selectedCategory) {
-                subcategories.forEach(subcategory => {
-                    const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
-                    if (!searchInput || subcategoryName.includes(searchInput)) {
-                        subcategory.style.display = "list-item";
-                        categoryVisible = true;
-                    } else {
-                        subcategory.style.display = "none";
-                    }
-                });
+        let url = ``;
+        if (searchInput !== '') {
+            searchInput = searchInput.toLowerCase();
+            url = `/homepage/${selectedCategory}/${searchInput}`;
+        } else {
+            url = `/homepage/${selectedCategory}`;
+        }
 
-                category.style.display = categoryVisible ? "block" : "none";
-            } else {
-                category.style.display = "none";
-            }
-        });
+        if (selectedCategory === 'Select Category (All)') {
+            url = `/homepage/`;
+        }
+
+        // const url = `/homepage/${selectedCategory}/${searchInput}`;
+        
+        window.location.href = url;
+
+        // categories.forEach(category => {
+        //     // window.alert("A")
+        //     // window.alert(category);
+        //     // window.alert('F')
+        //     const categorySlug = category.getAttribute("data-category-slug");
+        //     // window.alert(categorySlug);
+        //     // // window.alert(categorySlug);
+        //     const subcategories = category.querySelectorAll(".subcategory");
+        //     let categoryVisible = false;
+
+        //     if (!selectedCategory || categorySlug === selectedCategory) {
+        //         // window.alert('FF')
+        //         subcategories.forEach(subcategory => {
+        //             const subcategoryName = subcategory.getAttribute("data-subcategory-name").toLowerCase();
+        //             // window.alert(subcategoryName);
+        //             if (!searchInput || subcategoryName.includes(searchInput)) {
+        //                 subcategory.style.display = "list-item";
+        //                 categoryVisible = true;
+        //             } else {
+        //                 subcategory.style.display = "none";
+        //             }
+        //         });
+
+        //         category.style.display = categoryVisible ? "block" : "none";
+        //     } else {
+        //         category.style.display = "none";
+        //     }
+        // });
     });
 </script>
 
