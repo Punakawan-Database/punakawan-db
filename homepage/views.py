@@ -213,6 +213,14 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
     for x in promo_check:
         p.append(x['kode'])
         
+    dont_hack = db.query_all(f"select * from pekerja")
+    hecker = []
+    for x in dont_hack:
+        hecker.append(str(x['id']))
+        
+    if (request.session.get('user_id') in hecker):
+        return mampus(request)
+        
     context = {
         'selected_category': selected_category[0],
         'selected_subcategory': selected_subcategory,
@@ -236,8 +244,17 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
     
     
 def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
+    
+    dont_hack = db.query_all(f"select * from pelanggan")
+    hecker = []
+    for x in dont_hack:
+        hecker.append(str(x['id']))
+        
+    if (request.session.get('user_id') in hecker):
+        return mampus(request)
+    
     userID = request.session.get('user_id')
-    print(str(userID) + " userID")
+    # print(str(userID) + " userID")
     
     selected_category = []
     for x in categories:
@@ -308,13 +325,22 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
                 x['worker_name'] = str(j['nama'])
 
     # print(selected_testimoni)
+    # print(workers_lengkap)
+    
+    gaAdaButton = False
+    for x in workers_lengkap:
+        if str(x['id']) == str(userID):
+            # print("KONTSSS")
+            gaAdaButton = True
+            break
     context = {
         'category_slug' : str(kategori_slug),
         'selected_category' : selected_category[0],
         'selected_subcategory': selected_subcategory,
         'service_sessions': service_sessions,
         'workers': workers_lengkap,
-        'testimonials': selected_testimoni
+        'testimonials': selected_testimoni,
+        'gaAdaButton' : gaAdaButton,
     }
     
     return render(request, 'subkategori_pekerja.html', context)
@@ -505,7 +531,7 @@ def bergabung(request, kategori):
     db.query_one(f"insert into pekerja_kategori_jasa values('{userID}', '{kategori}')")
     # print(kategori)
     
-    return redirect('homepage')
+    return redirect(request, 'homepage')
 
 def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     userID = request.session.get('user_id')
@@ -540,10 +566,13 @@ def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     
     # db.query_one(f"insert into tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) values('{userID}', null, '{idKategoriJasa}', '{idMetodeBayar}', '{idDiskon}', 1, '2020-12-12')")
     
-    return redirect('view_pemesanan')
+    return redirect(request, 'view_pemesanan')
     # return homepage(request=request)
     
 def batalkan(request, idPesanan) :
     db.query_one(f"insert into tr_pemesanan_status values('{idPesanan}', '{'cdd30b67-9bf9-4999-a46f-ecd23d288058'}', '{datetime.now().replace(tzinfo=None)}')")
         
-    return redirect('view_pemesanan')
+    return redirect(request, 'view_pemesanan')
+
+def mampus(request):
+    return render(request, '404.html')

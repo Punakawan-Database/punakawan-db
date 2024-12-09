@@ -35,7 +35,7 @@ urlpatterns = [
         name='view_pemesanan'),
     
     
-    path('bergabung/<str:kategori>/',
+    path('/bergabung/<str:kategori>/',
         views.bergabung,
         name='bergabung'),
     # path('vd/',
