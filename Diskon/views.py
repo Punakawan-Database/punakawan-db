@@ -16,6 +16,7 @@ def diskon(request):
     context = {
         'vouchers': voucher_data,
         'promos': promo_data,
+        'metode_bayar': metode_bayar
     }
     
     return render(request, 'diskon.html', context)
