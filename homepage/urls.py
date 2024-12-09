@@ -54,7 +54,4 @@ urlpatterns = [
         views.batalkan,
         name='batalkan'),
     
-    path('/batalkan_pesanan/<uuid:idPesanan>/<int:biaya>/',
-        views.batalkan,
-        name='batalkan'),
 ]

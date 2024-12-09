@@ -195,6 +195,24 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
         x['potongan'] = int(x['potongan'])
         
     # print(dumps(discID_key))
+    voucher_check = db.query_all(f"select * from tr_pembelian_voucher where idpelanggan='{request.session.get('user_id')}' ")
+    # print(voucher_check)
+    promo_check = db.query_all(f"select * from promo")
+    
+    vc = []
+    vc2 = []
+    
+    for x in voucher_check:
+        vc.append(x['idvoucher'])
+        vc2.append(str(x['idmetodebayar']))
+    
+    print(vc)
+    print(vc2)
+    
+    p = []
+    for x in promo_check:
+        p.append(x['kode'])
+        
     context = {
         'selected_category': selected_category[0],
         'selected_subcategory': selected_subcategory,
@@ -204,6 +222,10 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
         'testimonials' : selected_testimoni,
         'metode_bayar' : metode_bayar,
         'discount_be' : dumps(discID_key),
+        'vc' : dumps(vc),
+        'vc2' : dumps(vc2),
+        'promo' : dumps(p),
+        # 'voucher_check' : dumps(voucher_check),
     }
     
     return render(request, "subkategori.html", context= context)
@@ -488,8 +510,7 @@ def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     return redirect('view_pemesanan')
     # return homepage(request=request)
     
-def batalkan(request, idPesanan, biaya=None) :
-    if (biaya == None):
-        db.query_one(f"insert into tr_pemesanan_status values('{idPesanan}', '{'cdd30b67-9bf9-4999-a46f-ecd23d288058'}', '{datetime.now().replace(tzinfo=None)}')")
+def batalkan(request, idPesanan) :
+    db.query_one(f"insert into tr_pemesanan_status values('{idPesanan}', '{'cdd30b67-9bf9-4999-a46f-ecd23d288058'}', '{datetime.now().replace(tzinfo=None)}')")
         
     return redirect('view_pemesanan')

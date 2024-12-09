@@ -271,15 +271,38 @@
             // window.alert(discountCode);
             try {
                 const discID = JSON.parse('{{ discount_be|safe|escapejs }}');
+                const vID = JSON.parse('{{ vc|safe|escapejs }}');
+                const vPID = JSON.parse('{{ vc2|safe|escapejs }}');
+                const promo = JSON.parse('{{ promo|safe|escapejs }}');
+
+                // window.alert(vID); window.alert(vPID);
 
                 for (let i = 0; i < discID.length; i++) {
                     if (discID[i][0] === discountCode) {
-                        window.alert("Diskon berhasil diterapkan!");
-                        discountAmount = discID[i][1];
-                        isdiscountAda = true;
-                        break;
+                        for (let j = 0; j < vID.length; j++) {
+                            if (vID[j] === discID[i][0]) {
+                                if (paymentMethod.value === vPID[j]) {
+                                    window.alert("Diskon (Voucher) berhasil diterapkan!");
+                                    discountAmount = discID[i][1];
+                                    isdiscountAda = true;
+                                    break;
+                                }
+                            }
+                        }
+                        for (let j = 0; j < promo.length; j++) {
+                            if (promo[j] == discID[i][0]) {
+                                window.alert("Diskon (Promo) berhasil diterapkan!");
+                                discountAmount = discID[i][1];
+                                isdiscountAda = true;
+                                break;
+                            }
+                        }
                     }
                 }
+                if (!isdiscountAda) {
+                    window.alert("Diskon tidak ditemukan atau tidak sesuai dengan metode pembayaran yang dipilih");
+                }
+                
             } catch (e) {
                 window.alert("LHO LAPO O IKI MUMET NDASKU " + e.message);
             }        
