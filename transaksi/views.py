@@ -338,53 +338,115 @@ def mypay_transaksi_transfer(request):
     no_hp = request.POST.get("no_hp")
     nominal = request.POST.get("nominal")
 
+    if not no_hp:
+        messages.error(request, "Nomor HP tujuan harus diisi")
+        return redirect("transaksi:mypay_transaksi")
+
+    if not nominal:
+        messages.error(request, "Nominal transfer harus diisi")
+        return redirect("transaksi:mypay_transaksi")
+
+    try:
+        nominal = float(nominal)
+    except ValueError:
+        messages.error(request, "Format nominal tidak valid")
+        return redirect("transaksi:mypay_transaksi")
+
+    if nominal <= 0:
+        messages.error(request, "Nominal harus lebih dari 0")
+        return redirect("transaksi:mypay_transaksi")
+
     # Get target user
     target_user = db.query_one(
         """
-        SELECT p.id
-        FROM PENGGUNA p
-        WHERE p.nohp = %s"
+        SELECT id, nama
+        FROM PENGGUNA
+        WHERE nohp = %s
         """,
         [no_hp],
     )
 
-    # Update riwayat transaksi sender
-    db.query_one(
+    if not target_user:
+        messages.error(request, "Nomor HP tujuan tidak ditemukan")
+        return redirect("transaksi:mypay_transaksi")
+
+    if target_user["id"] == curr_user["id"]:
+        messages.error(request, "Tidak dapat transfer ke diri sendiri")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Check sender balance
+    current_balance = db.query_one(
         """
-        INSERT INTO TR_MYPAY (userid, nominal, kategoriid, tgl)
-        VALUES (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Transfer'), NOW())
+        SELECT saldomypay
+        FROM PENGGUNA
+        WHERE id = %s
         """,
-        [curr_user["id"], nominal],
+        [curr_user["id"]],
     )
 
-    # Update riwayat transaksi receiver
-    db.query_one(
-        """
-        INSERT INTO TR_MYPAY (userid, nominal, kategoriid, tgl)
-        VALUES (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Transfer'), NOW())
-        """,
-        [curr_user["id"], nominal],
-    )
+    if not current_balance or current_balance["saldomypay"] < nominal:
+        messages.error(request, "Saldo tidak mencukupi")
+        return redirect("transaksi:mypay_transaksi")
 
-    # Update saldo sender
-    db.query_one(
+    # Update sender balance
+    updated_sender = db.query_one(
         """
-        UPDATE PENGGUNA p
-        SET p.saldomypay = p.saldomypay - %s
-        WHERE p.id = %s
+        UPDATE PENGGUNA
+        SET saldomypay = saldomypay - %s
+        WHERE id = %s
+        RETURNING saldomypay
         """,
         [nominal, curr_user["id"]],
     )
 
-    # Update saldo receiver
-    db.query_one(
+    if not updated_sender:
+        messages.error(request, "Gagal memperbarui saldo pengirim")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Update receiver balance
+    updated_receiver = db.query_one(
         """
-        UPDATE PENGGUNA p
-        SET p.saldomypay = p.saldomypay + %s
-        WHERE p.id = %s
+        UPDATE PENGGUNA
+        SET saldomypay = saldomypay + %s
+        WHERE id = %s
+        RETURNING saldomypay
         """,
-        [nominal, curr_user["id"]],
+        [nominal, target_user["id"]],
     )
+
+    if not updated_receiver:
+        messages.error(request, "Gagal memperbarui saldo penerima")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Log sender transaction
+    sender_transaction = db.query_one(
+        """
+        INSERT INTO TR_MYPAY (id, userid, nominal, kategoriid, tgl)
+        VALUES (%s, %s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Transfer'), NOW())
+        RETURNING *
+        """,
+        [uuid.uuid4(), curr_user["id"], -nominal],
+    )
+
+    if not sender_transaction:
+        messages.error(request, "Gagal mencatat transaksi pengirim")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Log receiver transaction
+    receiver_transaction = db.query_one(
+        """
+        INSERT INTO TR_MYPAY (id, userid, nominal, kategoriid, tgl)
+        VALUES (%s, %s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Transfer'), NOW())
+        RETURNING *
+        """,
+        [uuid.uuid4(), target_user["id"], nominal],
+    )
+
+    if not receiver_transaction:
+        messages.error(request, "Gagal mencatat transaksi penerima")
+        return redirect("transaksi:mypay_transaksi")
+
+    messages.success(request, f"Transfer Rp {nominal:,.0f} ke {target_user['nama']} berhasil")
 
     return redirect("transaksi:mypay")
 
