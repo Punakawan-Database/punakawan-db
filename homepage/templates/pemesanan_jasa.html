@@ -55,12 +55,12 @@
             {% for order in s_orders %}
             <div class="order bg-white rounded-2xl shadow-lg p-6" subcategory="{{ order.subcategory }}" status="{{ order.status }}">
                 <p class="mb-4">
-                    <strong>ID:</strong> {{ order.idtrpemesanan }}<br>
+                    <!-- <strong>ID:</strong> {{ order.idtrpemesanan }}<br> -->
                     <strong>Subkategori:</strong> {{ order.subcategory }}<br>
                     <strong>Service Session:</strong> {{ order.sesi }}<br>
                     <strong>Total Payment:</strong> {{ order.totalbiaya }}<br>
                     <strong>Worker:</strong> {{ order.worker }}<br>
-                    <strong>Customer:</strong> {{ order.customer }}<br>
+                    <!-- <strong>Customer:</strong> {{ order.customer }}<br> -->
                     <strong>Status:</strong> {{ order.status }}
                 </p>
 
@@ -175,12 +175,7 @@
     function batalkan(status, totalbiaya, id) {
         // window.alert(status);
         // window.alert(totalbiaya);
-        if (status == "Menunggu Pembayaran") {
-            window.location.href = `/homepage//batalkan_pesanan/${id}`;
-            // window.alert("BISA DIBATALKAN");
-        } else {
-            window.location.href = `/homepage//batalkan_pesanan/${id}/${totalbiaya}`;
-        }
+        window.location.href = `/homepage//batalkan_pesanan/${id}`;
     }
 </script>
 {% endblock content %}

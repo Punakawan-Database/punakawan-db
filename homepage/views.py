@@ -350,18 +350,30 @@ def view_pemesanan(request, subkategori=None, status=None):
             j['status'] = 'Pesanan Dibatalkan'
             selected_pemesanan.append(j)
         else:
-            if len(bak_status) == 1:
-                j['status'] = 'Menunggu Pembayaran'
-            if len(bak_status) == 2:
-                j['status'] = 'Mencari Pekerja Terdekat'
-            if len(bak_status) == 3:
-                j['status'] = 'Menunggu Pekerja Berangkat'
-            if len(bak_status) == 4:
-                j['status'] = 'Pekerja Tiba di Lokasi'
-            if len(bak_status) == 5:
-                j['status'] = 'Pelayanan Jasa Sedang Dilakukan'
-            if len(bak_status) == 6:
-                j['status'] = 'Pesanan Selesai'
+            if 'Menunggu Pembayaran' not in bak_status:
+                if len(bak_status) == 1:
+                    j['status'] = 'Mencari Pekerja Terdekat'
+                if len(bak_status) == 2:
+                    j['status'] = 'Menunggu Pekerja Berangkat'
+                if len(bak_status) == 3:
+                    j['status'] = 'Pekerja Tiba di Lokasi'
+                if len(bak_status) == 4:
+                    j['status'] = 'Pelayanan Jasa Sedang Dilakukan'
+                if len(bak_status) == 5:
+                    j['status'] = 'Pesanan Selesai'
+            else:
+                if len(bak_status) == 1:
+                    j['status'] = 'Menunggu Pembayaran'
+                if len(bak_status) == 2:
+                    j['status'] = 'Mencari Pekerja Terdekat'
+                if len(bak_status) == 3:
+                    j['status'] = 'Menunggu Pekerja Berangkat'
+                if len(bak_status) == 4:
+                    j['status'] = 'Pekerja Tiba di Lokasi'
+                if len(bak_status) == 5:
+                    j['status'] = 'Pelayanan Jasa Sedang Dilakukan'
+                if len(bak_status) == 6:
+                    j['status'] = 'Pesanan Selesai'
         
             selected_pemesanan.append(j)
     
@@ -497,11 +509,21 @@ def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     if (idDiskon == None):
         # print(uuid_generator['uuid_generate_v4'])
         # print("FFF")
-        db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', null, '{idMetodeBayar}')")
-        db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
+        # print(str(idMetodeBayar) == "636e8811-07b5-45ef-97d2-60986aee59e9")
+        if (str(idMetodeBayar) == "636e8811-07b5-45ef-97d2-60986aee59e9"):
+            db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', null, '{idMetodeBayar}')")
+            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
+        else:
+            # print("AMAN KOSK")
+            db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', null, '{idMetodeBayar}')")
+            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', '61772051-1bac-4b03-a9a2-a3d2ddf1537b', '{timestamp}')")
     else:
-        db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', '{idDiskon}', '{idMetodeBayar}')")
-        db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
+        if (str(idMetodeBayar) == "636e8811-07b5-45ef-97d2-60986aee59e9"):
+            db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', '{idDiskon}', '{idMetodeBayar}')")
+            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
+        else:
+            db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', '{idDiskon}', '{idMetodeBayar}')")
+            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', '61772051-1bac-4b03-a9a2-a3d2ddf1537b', '{timestamp}')")
     # print(f"{idKategoriJasa} {Sesi} {idMetodeBayar} {idDiskon}")
     
     
