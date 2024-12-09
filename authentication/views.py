@@ -83,6 +83,13 @@ def register_pekerja(request):
                 if cursor.fetchone()[0] > 0:
                     messages.error(request, "Nomor handphone sudah terdaftar. Gunakan nomor lain.")
                     return redirect('register_pekerja') 
+                
+            # cek apakah nohp sudah teregister sebelumnya
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM pekerja WHERE namabank = %s AND nomorrekening = %s", [namabank, nomorrekening])
+                if cursor.fetchone()[0] > 0:
+                    messages.error(request, "Nomor rekening dengan bank tersebut sudah ada, gunakan rekening lain.")
+                    return redirect('register_pekerja') 
 
             # generate UUID
             user_id = str(uuid.uuid4())
