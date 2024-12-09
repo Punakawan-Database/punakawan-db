@@ -333,25 +333,64 @@ def mypay_transaksi_withdraw(request):
     curr_user = logged_user
     # curr_user = request.session.get("user")
 
+    # Get and validate nominal
     nominal = request.POST.get("nominal")
+    if not nominal:
+        messages.error(request, "nominal withdraw harus diisi")
+        return redirect("transaksi:mypay_transaksi")
 
-    # Log transaction
-    db.query_one(
+    # Convert to float and validate
+    try:
+        nominal = float(nominal)
+    except ValueError:
+        messages.error(request, "nominal withdraw harus berupa angka")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Business rules validation
+    if nominal <= 0:
+        messages.error(request, "nominal withdraw harus lebih dari 0")
+        return redirect("transaksi:mypay_transaksi")
+
+    # Check current balance
+    current_balance = db.query_one(
         """
-        INSERT INTO TR_MYPAY (userid, nominal, kategoriid, tgl)
-        VALUES (%s, %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Withdrawal'), NOW())
+        SELECT saldomypay
+        FROM PENGGUNA
+        WHERE id = %s
         """,
-        [curr_user["id"], nominal],
+        [curr_user["id"]],
     )
 
+    if not current_balance or current_balance["saldomypay"] < nominal:
+        messages.error(request, "saldo tidak mencukupi")
+        return redirect("transaksi:mypay_transaksi")
+
+    withdrawal = db.query_one(
+        """
+        INSERT INTO TR_MYPAY (id, userid, tgl, nominal, kategoriid)
+        VALUES (%s, %s, NOW(), %s, (SELECT id FROM KATEGORI_TR_MYPAY WHERE nama = 'Withdraw'))
+        RETURNING *
+        """,
+        [uuid.uuid4(), curr_user["id"], nominal],
+    )
+
+    if not withdrawal:
+        messages.error(request, "gagal mencatat penarikan")
+        return redirect("transaksi:mypay_transaksi")
+
     # Update balance
-    db.query_one(
+    updated_user = db.query_one(
         """
         UPDATE PENGGUNA
         SET saldomypay = saldomypay - %s
-        WHERE id = %s"
+        WHERE id = %s
+        RETURNING *
         """,
         [nominal, curr_user["id"]],
     )
+
+    if not updated_user:
+        messages.error(request, "gagal melakukan penarikan")
+        return redirect("transaksi:mypay_transaksi")
 
     return redirect("transaksi:mypay")
