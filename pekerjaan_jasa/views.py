@@ -37,6 +37,7 @@ logged_user = {
 # }
 
 
+
 def pekerjaan_jasa(request):
     curr_user = logged_user
     # curr_user = request.session.get("user")

@@ -10,9 +10,20 @@
 
 <div class="relative h-screen flex justify-center items-center bg-blue-500 p-5">
     <div class="mt-5 relative bg-white p-8 rounded-2xl shadow-2xl transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl max-w-md w-full h-[82vh] overflow-y-auto">
-        <h1 class="text-blue-600 text-center mb-6 text-2xl font-bold">Registrasi Pengguna</h1>
-        <form method="post" class="flex flex-col gap-6">
+        <h1 class="text-blue-600 text-center mb-4 text-2xl font-bold">Registrasi Pelanggan</h1>
+
+        <!-- Alert Message -->
+        {% if messages %}
+        <div class="col-span-1 md:col-span-2 bg-red-500 text-white text-center py-2 px-3 rounded-md mb-2">
+            {% for message in messages %}
+                <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% csrf_token %}
+
             <div class="flex flex-col">
                 <label for="name" class="text-blue-600 font-semibold mb-2">Nama:</label>
                 <input type="text" id="name" name="name" class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -21,32 +32,32 @@
                 <label for="password" class="text-blue-600 font-semibold mb-2">Password:</label>
                 <input type="password" id="password" name="password" class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col col-span-1 md:col-span-2">
                 <span class="text-blue-600 font-semibold mb-2">Jenis Kelamin:</span>
                 <div class="flex gap-4">
                     <label class="flex items-center gap-2">
                         <input type="radio" name="gender" value="L" class="focus:ring-blue-400">
-                        L
+                        Laki-Laki
                     </label>
                     <label class="flex items-center gap-2">
                         <input type="radio" name="gender" value="P" class="focus:ring-blue-400">
-                        P
+                        Perempuan
                     </label>
                 </div>
             </div>
             <div class="flex flex-col">
-                <label for="phone" class="text-blue-600 font-semibold mb-2">NoHP:</label>
+                <label for="phone" class="text-blue-600 font-semibold mb-2">No. HP:</label>
                 <input type="text" id="phone" name="phone" class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
             <div class="flex flex-col">
                 <label for="dob" class="text-blue-600 font-semibold mb-2">Tanggal Lahir:</label>
                 <input type="date" id="dob" name="dob" class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col col-span-1 md:col-span-2">
                 <label for="address" class="text-blue-600 font-semibold mb-2">Alamat:</label>
                 <textarea id="address" name="address" rows="3" class="p-3 text-base rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
             </div>
-            <div class="flex justify-center">
+            <div class="flex justify-center col-span-1 md:col-span-2">
                 <button type="submit" class="bg-blue-600 text-white py-3 px-4 rounded font-bold hover:bg-blue-700 transition-all w-full">Register</button>
             </div>
         </form>

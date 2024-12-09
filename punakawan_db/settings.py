@@ -33,9 +33,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".vercel.app"]
 
-AUTH_USER_MODEL = "authentication.CustomUser"
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,6 +48,7 @@ INSTALLED_APPS = [
     "Diskon",
     "transaksi",
     "pekerjaan_jasa",
+    "utils",
 ]
 
 MIDDLEWARE = [
@@ -99,6 +97,7 @@ DATABASES = {
         "PORT": getenv("PGPORT", 5432),
         "OPTIONS": {
             "sslmode": "require",
+            "options": "-c search_path=basdat",
         },
         "DISABLE_SERVER_SIDE_CURSORS": True,
     }

@@ -2,16 +2,16 @@
 <nav id="navbar" class="fixed top-0 left-0 z-50 w-full transition duration-300 ease-in-out bg-transparent backdrop-blur-md">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <!-- Left side - Brand and Role -->
+      <!-- Left side - Role -->
       <div class="flex items-center">
-        <span class="text-white font-semibold mr-4">Role: Pengguna</span>
+        <span class="text-white font-semibold mr-4">Role: Pelanggan</span>
       </div>
 
       <!-- Center - Main Navigation -->
       <div class="flex items-center space-x-6">
-        <a href="show_main" class="nav-link">Homepage</a>
+        <a href="{% url 'homepage' %}" class="nav-link">Homepage</a>
         <a href="" class="nav-link">MyPay</a>
-        <a href="" class="nav-link">Kelola Pesanan</a>
+        <a href="/homepage//pemesanan_jasa" class="nav-link">Kelola Pesanan</a>
         <a href="" class="nav-link">Diskon</a>
       </div>
 
@@ -24,7 +24,7 @@
           </svg>
         </button>
         <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-          <a href="{% url 'profile_pengguna' %}" class="dropdown-item">Profile</a>
+          <a href="{% url 'profile_pelanggan' %}" class="dropdown-item">Profile</a>
           <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
         </div>
       </div>
