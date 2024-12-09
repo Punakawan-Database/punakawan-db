@@ -195,9 +195,9 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
         x['potongan'] = int(x['potongan'])
         
     # print(dumps(discID_key))
-    voucher_check = db.query_all(f"select * from tr_pembelian_voucher where idpelanggan='{request.session.get('user_id')}' ")
+    voucher_check = db.query_all(f"select * from tr_pembelian_voucher where idpelanggan='{request.session.get('user_id')}' and tglakhir >= current_date")
     # print(voucher_check)
-    promo_check = db.query_all(f"select * from promo")
+    promo_check = db.query_all(f"select * from promo where tglakhirberlaku >= current_date")
     
     vc = []
     vc2 = []
@@ -206,8 +206,8 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
         vc.append(x['idvoucher'])
         vc2.append(str(x['idmetodebayar']))
     
-    print(vc)
-    print(vc2)
+    # print(vc)
+    # print(vc2)
     
     p = []
     for x in promo_check:
