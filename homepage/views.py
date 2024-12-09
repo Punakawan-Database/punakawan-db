@@ -531,7 +531,7 @@ def bergabung(request, kategori):
     db.query_one(f"insert into pekerja_kategori_jasa values('{userID}', '{kategori}')")
     # print(kategori)
     
-    return redirect(request, 'homepage')
+    return redirect('homepage')
 
 def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     userID = request.session.get('user_id')
@@ -566,13 +566,13 @@ def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     
     # db.query_one(f"insert into tr_pemesanan_jasa (idpelanggan, idpekerja, idkategorijasa, idmetodebayar, iddiskon, idstatus, tanggal) values('{userID}', null, '{idKategoriJasa}', '{idMetodeBayar}', '{idDiskon}', 1, '2020-12-12')")
     
-    return redirect(request, 'view_pemesanan')
+    return redirect('view_pemesanan')
     # return homepage(request=request)
     
 def batalkan(request, idPesanan) :
     db.query_one(f"insert into tr_pemesanan_status values('{idPesanan}', '{'cdd30b67-9bf9-4999-a46f-ecd23d288058'}', '{datetime.now().replace(tzinfo=None)}')")
         
-    return redirect(request, 'view_pemesanan')
+    return redirect('view_pemesanan')
 
 def mampus(request):
-    return render(request, '404.html')
+    return render('404.html')
