@@ -1,7 +1,7 @@
+import json
 from django.shortcuts import render, redirect
 from django.urls import *
 from utils import db;
-
 from django.contrib.auth import get_user
 from json import dumps 
 import requests
@@ -639,3 +639,23 @@ def batalkan(request, idPesanan) :
 
 def mampus(request):
     return render('404.html')
+
+def testimoni(request):
+    userID = request.session.get('user_id')
+    userID = str(userID)
+    
+    if request.method == "POST":
+        data = request.body    
+        data = data.decode("utf-8")
+        data = json.loads(data)
+    
+    # print(len(data))
+    # print(data)
+    rating = data['rating']
+    comment = data['comment']
+    idPemesanan = data['id']
+    
+    # print(rating, comment, idPemesanan)
+    db.query_all(f"insert into testimoni values('{idPemesanan}',  now(),'{comment}', '{rating}')")
+    return redirect('homepage')
+    # return render(request, 'submit-testimoni.html')

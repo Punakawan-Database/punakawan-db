@@ -72,7 +72,8 @@
                 {% endif %}
 
                 {% if order.status == "Pesanan Selesai" %}
-                <button onclick="openTestimoniModal()"
+                <button onclick="openTestimoniModal(this)"
+                        data-order-id ="{{ order.idtrpemesanan }}" 
                         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                     Buat Testimoni
                 </button>
@@ -112,7 +113,10 @@
 
 <script>
     // Open Modal
-    function openTestimoniModal() {
+    let currentOrderId = null;
+
+    function openTestimoniModal(button) {
+        currentOrderId = button.getAttribute('data-order-id');
         document.getElementById('testimoni-modal').classList.remove('hidden');
     }
 
@@ -129,15 +133,16 @@
         const comment = document.getElementById('comment').value;
 
 
-        fetch('/submit-testimoni/', {
+        fetch('/homepage//submit-testimoni/', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': '{{ csrf_token }}'
             },
             body: JSON.stringify({
-            rating: rating,
-            comment: comment
+                id : currentOrderId,
+                rating: rating,
+                comment: comment,
             })
         }).then(response => {
             if (response.ok) {
@@ -145,6 +150,7 @@
             closeTestimoniModal();
             } else {
             alert('Failed to submit testimonial. Please try again.');
+            // window.alert(currentOrderId)
             }
         }).catch(error => {
             alert('Failed to submit testimonial. Please try again.');

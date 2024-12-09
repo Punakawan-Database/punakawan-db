@@ -54,4 +54,7 @@ urlpatterns = [
         views.batalkan,
         name='batalkan'),
     
+    path('/submit-testimoni/',
+        views.testimoni,
+        name='testimoni'),
 ]
