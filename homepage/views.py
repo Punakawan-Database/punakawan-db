@@ -445,6 +445,7 @@ def view_pemesanan(request, subkategori=None, status=None):
     selected_statusses = set()
     
     # print(request.session.get('user_id'))
+    # print(subkategori==None, status)
     if (subkategori == None and status == None):
         for xx in orders:
             selected_statusses.add(xx['status'])
@@ -461,8 +462,16 @@ def view_pemesanan(request, subkategori=None, status=None):
             if str(xx['idpelanggan']) == str(request.session.get('user_id')):
                 if (str(xx['subcategory']) == str(subkategori)):
                     selected_orders.append(xx)
-                    
-                    
+    
+    elif (subkategori == None and status != None):
+        for xx in orders:
+            selected_statusses.add(xx['status'])
+            selected_subcategories.add(xx['subcategory'])
+            # print(f"FFF {request.session.get('user_id')} {xx['idpelanggan']}")
+            if str(xx['idpelanggan']) == str(request.session.get('user_id')):
+                if (str(xx['status']) == str(status)):
+                    selected_orders.append(xx)
+                                
     else:
         for xx in orders:
             selected_statusses.add(xx['status'])
