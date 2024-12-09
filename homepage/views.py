@@ -326,6 +326,7 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
 # print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
 
 def view_pemesanan(request, subkategori=None, status=None):
+    # print(request.session.get('user_id'))
     bak_id_id = []
     s_pemesanan = db.query_all("SELECT DISTINCT  id FROM tr_pemesanan_jasa")
     for jj in s_pemesanan:
@@ -509,6 +510,7 @@ def bergabung(request, kategori):
 def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
     userID = request.session.get('user_id')
     userID = str(userID)
+    # print(userID)
     
     uuid_generator = db.query_one("select uuid_generate_v4()")
     uuid_generator = uuid_generator['uuid_generate_v4']
@@ -525,14 +527,14 @@ def pesan(request, idKategoriJasa, Sesi, idMetodeBayar, price, idDiskon=None):
         else:
             # print("AMAN KOSK")
             db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', null, '{idMetodeBayar}')")
-            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', '61772051-1bac-4b03-a9a2-a3d2ddf1537b', '{timestamp}')")
+            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', '9f4570a1-4aac-4c68-bc4f-3995b7599a0e', '{timestamp}')")
     else:
         if (str(idMetodeBayar) == "636e8811-07b5-45ef-97d2-60986aee59e9"):
             db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', '{idDiskon}', '{idMetodeBayar}')")
             db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', 'feae3333-a7df-4800-a26e-a0017bbaf59c', '{timestamp}')")
         else:
             db.query_one(f"insert into tr_pemesanan_jasa values('{uuid_generator}', '{dates}', null, null, '{price}', '{userID}', null, '{idKategoriJasa}', '{Sesi}', '{idDiskon}', '{idMetodeBayar}')")
-            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', '61772051-1bac-4b03-a9a2-a3d2ddf1537b', '{timestamp}')")
+            db.query_one(f"insert into tr_pemesanan_status values('{uuid_generator}', '9f4570a1-4aac-4c68-bc4f-3995b7599a0e', '{timestamp}')")
     # print(f"{idKategoriJasa} {Sesi} {idMetodeBayar} {idDiskon}")
     
     
