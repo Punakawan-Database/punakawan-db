@@ -5,42 +5,16 @@ from django.views.decorators.http import require_POST
 
 from utils import db
 
-logged_user = {
-    "id": "65ae2c07-9011-4a53-bd88-73a6b577691d",
-    "role": "pekerja",
-    "nama": "Jhon Doe",
-}
-
-# context = {
-#     "pesanan": [
-#         {
-#             "subkategori": "Daily Cleaning",
-#             "pelanggan": "Ahmad Fauzi",
-#             "tanggal_pemesanan": "19-10-2020",
-#             "tanggal_pekerjaan": "19-10-2023",
-#             "total_biaya": 10000,
-#         },
-#     ],
-# }
-
-# context = {
-#     "pesanan": [
-#         {
-#             "subkategori": "Setrika",
-#             "nama_pelanggan": "Jono Dewoto",
-#             "tanggal_pemesanan": "19-10-2020",
-#             "tanggal_pekerjaan": "19-10-2023",
-#             "total_biaya": 10000,
-#             "status_pesanan": "Menunggu Pekerja Berangkat",
-#         },
-#     ]
-# }
-
 
 
 def pekerjaan_jasa(request):
-    curr_user = logged_user
-    # curr_user = request.session.get("user")
+    curr_user = {"id": request.session.get("user_id"), "role": request.session.get("user_role")}
+
+    if curr_user["role"] != "pekerja" and curr_user["role"] != "pelanggan":
+        return redirect("/auth/login/")
+
+    if curr_user["role"] != "pekerja":
+        return redirect("/homepage/")
 
     category_filter = request.GET.get("kategori")
     subcategory_filter = request.GET.get("subkategori")
@@ -146,8 +120,13 @@ def pekerjaan_jasa(request):
 @require_POST
 # TODO: Better error handling
 def pekerjaan_jasa_update(request):
-    curr_user = logged_user
-    # curr_user = request.session.get("user")
+    curr_user = {"id": request.session.get("user_id"), "role": request.session.get("user_role")}
+
+    if curr_user["role"] != "pekerja" and curr_user["role"] != "pelanggan":
+        return redirect("/auth/login/")
+
+    if curr_user["role"] != "pekerja":
+        return redirect("/homepage/")
 
     order_id = request.POST.get("order_id")
     if not order_id:
@@ -193,8 +172,13 @@ def pekerjaan_jasa_update(request):
 
 
 def pekerjaan_jasa_status(request):
-    curr_user = logged_user
-    # curr_user = request.session.get("user")
+    curr_user = {"id": request.session.get("user_id"), "role": request.session.get("user_role")}
+
+    if curr_user["role"] != "pekerja" and curr_user["role"] != "pelanggan":
+        return redirect("/auth/login/")
+
+    if curr_user["role"] != "pekerja":
+        return redirect("/homepage/")
 
     subcategory_filter = request.GET.get("subkategori")
     status_filter = request.GET.get("status")
@@ -310,6 +294,14 @@ def pekerjaan_jasa_status(request):
 @require_POST
 # TODO: Better error handling
 def pekerjaan_jasa_status_update(request):
+    curr_user = {"id": request.session.get("user_id"), "role": request.session.get("user_role")}
+
+    if curr_user["role"] != "pekerja" and curr_user["role"] != "pelanggan":
+        return redirect("/auth/login/")
+
+    if curr_user["role"] != "pekerja":
+        return redirect("/homepage/")
+
     order_id = request.POST.get("order_id")
     status_id = request.POST.get("status_id")
 

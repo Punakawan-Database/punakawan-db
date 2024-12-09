@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+    {% if user.role == "pelanggan" %}
+        {% include "navbar_pelanggan.html" %}
+    {% else %}
+        {% include "navbar_pekerja.html" %}
+    {% endif %}
     <div class="min-h-screen bg-blue-600">
         <div class="max-w-2xl mx-auto px-4 py-8">
             <!-- Header -->
-            <div class="text-center text-white mb-8">
+            <div class="text-center text-white my-8">
                 <h1 class="text-4xl font-bold mb-2">Transaction Form</h1>
                 <p class="text-xl">Choose your transaction type</p>
             </div>
