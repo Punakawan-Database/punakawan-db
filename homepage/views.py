@@ -12,33 +12,34 @@ from datetime import date, datetime
 
 # Create your views here.
 
-fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
-fetch_sub_categories = db.query_all("SELECT * FROM subkategori_jasa")
-pelanggan = db.query_all("SELECT * FROM PELANGGAN")
-pekerja = db.query_all("SELECT * FROM PEKERJA")
-pengguna = db.query_all("SELECT * from PENGGUNA")
-
-# print(fetch_categories[0]['id'])
-# print(fetch_sub_categories[0]['kategorijasaid'])
-
-for j in fetch_categories:
-    j.update({'subcategories': []})
-
-# print(fetch_categories)
-for j in fetch_categories:
-    for i in fetch_sub_categories:
-        if (i["kategorijasaid"] == j['id']):
-            j['subcategories'].append(i)
-            
-
-categories = fetch_categories
-
-testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
 # print(testimoni[0])
 
 # print(categories)
 def homepage(request, kategori = None, subkategori = None):
-    global categories
+    
+    fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
+    fetch_sub_categories = db.query_all("SELECT * FROM subkategori_jasa")
+    pelanggan = db.query_all("SELECT * FROM PELANGGAN")
+    pekerja = db.query_all("SELECT * FROM PEKERJA")
+    pengguna = db.query_all("SELECT * from PENGGUNA")
+
+    # print(fetch_categories[0]['id'])
+    # print(fetch_sub_categories[0]['kategorijasaid'])
+
+    for j in fetch_categories:
+        j.update({'subcategories': []})
+
+    # print(fetch_categories)
+    for j in fetch_categories:
+        for i in fetch_sub_categories:
+            if (i["kategorijasaid"] == j['id']):
+                j['subcategories'].append(i)
+                
+
+    categories = fetch_categories
+    
+    
+    # global categories
     # user = get_user(request)
     userID = request.session.get('user_id')
     # print(userID + " FFF")
@@ -99,6 +100,21 @@ def homepage(request, kategori = None, subkategori = None):
 
 
 def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
+    fetch_sub_categories = db.query_all("SELECT * FROM subkategori_jasa")
+    fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
+    for j in fetch_categories:
+        j.update({'subcategories': []})
+
+    # print(fetch_categories)
+    for j in fetch_categories:
+        for i in fetch_sub_categories:
+            if (i["kategorijasaid"] == j['id']):
+                j['subcategories'].append(i)
+                
+
+    categories = fetch_categories
+    
+    
     selected_category = []
     for x in categories:
         if str(x["id"]) == str(kategori_slug):
@@ -168,9 +184,12 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
     # print(selected_category)
     
     selected_testimoni = []
+    testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
     for x in testimoni:
         if str(x['idkategorijasa']) == str(subkategori_slug):
             selected_testimoni.append(x)
+    
+    pengguna = db.query_all("SELECT * from PENGGUNA")
     
     # print(selected_testimoni)
     for j in pengguna:
@@ -245,6 +264,27 @@ def subkategori_jasa(request, kategori_slug, subkategori_slug, filtering=None):
     
 def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
     
+    fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
+    fetch_sub_categories = db.query_all("SELECT * FROM subkategori_jasa")
+    pelanggan = db.query_all("SELECT * FROM PELANGGAN")
+    pekerja = db.query_all("SELECT * FROM PEKERJA")
+    pengguna = db.query_all("SELECT * from PENGGUNA")
+
+    # print(fetch_categories[0]['id'])
+    # print(fetch_sub_categories[0]['kategorijasaid'])
+
+    for j in fetch_categories:
+        j.update({'subcategories': []})
+
+    # print(fetch_categories)
+    for j in fetch_categories:
+        for i in fetch_sub_categories:
+            if (i["kategorijasaid"] == j['id']):
+                j['subcategories'].append(i)
+                
+
+    categories = fetch_categories
+    
     dont_hack = db.query_all(f"select * from pelanggan")
     hecker = []
     for x in dont_hack:
@@ -309,6 +349,7 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
     
     
     selected_testimoni = []
+    testimoni = db.query_all("SELECT * FROM TESTIMONI, tr_pemesanan_jasa where tr_pemesanan_jasa.id = testimoni.idtrpemesanan")
     for x in testimoni:
         if str(x['idkategorijasa']) == str(subkategori_slug):
             selected_testimoni.append(x)
@@ -352,6 +393,28 @@ def subkategori_jasa_pekerja(request, kategori_slug, subkategori_slug):
 # print(len(order) == len(db.query_all("select * from tr_pemesanan_status")))
 
 def view_pemesanan(request, subkategori=None, status=None):
+    
+    fetch_categories = db.query_all("SELECT * FROM kategori_jasa")
+    fetch_sub_categories = db.query_all("SELECT * FROM subkategori_jasa")
+    pelanggan = db.query_all("SELECT * FROM PELANGGAN")
+    pekerja = db.query_all("SELECT * FROM PEKERJA")
+    pengguna = db.query_all("SELECT * from PENGGUNA")
+
+    # print(fetch_categories[0]['id'])
+    # print(fetch_sub_categories[0]['kategorijasaid'])
+
+    for j in fetch_categories:
+        j.update({'subcategories': []})
+
+    # print(fetch_categories)
+    for j in fetch_categories:
+        for i in fetch_sub_categories:
+            if (i["kategorijasaid"] == j['id']):
+                j['subcategories'].append(i)
+                
+
+    categories = fetch_categories
+    
     # print(request.session.get('user_id'))
     bak_id_id = []
     s_pemesanan = db.query_all("SELECT DISTINCT  id FROM tr_pemesanan_jasa")
