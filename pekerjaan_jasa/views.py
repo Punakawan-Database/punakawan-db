@@ -158,7 +158,8 @@ def pekerjaan_jasa_update(request):
         SET idpekerja = %s,
             tglpekerjaan = CURRENT_DATE,
             waktupekerjaan = CURRENT_DATE + interval '1 day' * sesi
-        WHERE id_tr_pemesanan_jasa = %s
+        WHERE id = %s
+        RETURNING *
         """,
         [curr_user["id"], order_id],
     )
