@@ -209,7 +209,7 @@ def mypay_transaksi_bayar(request):
     if curr_user["role"] != "pelanggan" and curr_user["role"] != "pekerja":
         return redirect("/auth/login/")
 
-    if curr_user["role"] != "pekerja":
+    if curr_user["role"] != "pelanggan":
         return redirect("/homepage/")
 
     order_id = request.POST.get("jasa_id")

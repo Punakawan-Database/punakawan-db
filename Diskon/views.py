@@ -1,55 +1,33 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import *
+from utils import db;
+
+from django.contrib.auth import get_user
+from json import dumps 
+import requests
 from datetime import datetime, timedelta
 
 # Create your views here.
 def diskon(request):
-    voucher_data = [
-        {
-            'kode': 'DISC50',
-            'potongan': '50%',
-            'min_transaksi': 'Rp 100.000',
-            'jumlah_hari': '30',
-            'kuota': '100',
-            'harga': 'Rp 25.000'
-        },
-        {
-            'kode': 'SAVE25',
-            'potongan': '25%',
-            'min_transaksi': 'Rp 50.000',
-            'jumlah_hari': '15',
-            'kuota': '200',
-            'harga': 'Rp 15.000'
-        },
-        {
-            'kode': 'MEGA75',
-            'potongan': '75%',
-            'min_transaksi': 'Rp 200.000',
-            'jumlah_hari': '7',
-            'kuota': '50',
-            'harga': 'Rp 45.000'
-        }
-    ]
-
-    # Generate dummy data for promos
-    # Creating actual dates for the next 3 months
-    promo_data = [
-        {
-            'kode': 'NEWUSER2024',
-            'tanggal_akhir': (datetime.now() + timedelta(days=30)).strftime('%d %B %Y')
-        },
-        {
-            'kode': 'SPECIAL10',
-            'tanggal_akhir': (datetime.now() + timedelta(days=60)).strftime('%d %B %Y')
-        },
-        {
-            'kode': 'HOLIDAY24',
-            'tanggal_akhir': (datetime.now() + timedelta(days=90)).strftime('%d %B %Y')
-        }
-    ]
+    idUser = request.session.get('user_id')
+    saldo = db.query_one("SELECT saldomypay FROM pengguna WHERE id = %s", (idUser,))['saldomypay']
+    voucher_data = db.query_all("SELECT * FROM voucher JOIN diskon ON voucher.kode = diskon.kode")
+    promo_data = db.query_all("SELECT * FROM promo JOIN diskon ON promo.kode = diskon.kode")
+    metode_bayar = db.query_all("SELECT * FROM metode_bayar")
 
     context = {
         'vouchers': voucher_data,
         'promos': promo_data,
+        'metode_bayar': metode_bayar,
+        'saldo': saldo,
     }
     
     return render(request, 'diskon.html', context)
+
+def beli_voucher(request, kode, idmetode, tglakhir):
+    tglawal = datetime.now()
+    idUser = request.session.get('user_id')
+    price = db.query_one("SELECT harga FROM voucher WHERE kode = %s", (kode,))['harga']
+    db.query_one("UPDATE pengguna SET saldomypay = saldomypay - %s WHERE id = %s", (price, idUser))
+    db.query_one("INSERT INTO TR_PEMBELIAN_VOUCHER VALUES (uuid_generate_v4(), %s, %s, 0, (SELECT Id from PELANGGAN WHERE Id = %s), %s, (SELECT Id from METODE_BAYAR WHERE NAMA = %s))", (tglawal, tglakhir, idUser, kode, idmetode))
+    return redirect('diskon')
